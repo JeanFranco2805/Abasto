@@ -1,0 +1,31 @@
+<Window x:Class="SupermercadoPOS.Dialogs.SuspendedSaleDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Reanudar venta"
+        Width="760" Height="540" ResizeMode="CanResize"
+        WindowStartupLocation="CenterOwner"
+        Background="#F3F5F8"
+        FontFamily="Segoe UI">
+  <Grid Margin="22">
+    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+    <StackPanel Margin="0,0,0,14">
+      <TextBlock Text="Ventas suspendidas" FontSize="24" FontWeight="Bold" Foreground="#172B4D" />
+      <TextBlock Text="Selecciona una venta para continuar el cobro." Foreground="#667085" Margin="0,4,0,0" />
+    </StackPanel>
+    <DataGrid x:Name="SalesGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True"
+              CanUserAddRows="False" SelectionMode="Single" HeadersVisibility="Column"
+              Background="White" BorderBrush="#EAECF0" RowHeight="42">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Venta" Binding="{Binding Id}" Width="90" />
+        <DataGridTextColumn Header="Suspendida" Binding="{Binding CreatedAtUtc, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="190" />
+        <DataGridTextColumn Header="Cajero" Binding="{Binding CashierName}" Width="*" />
+        <DataGridTextColumn Header="Productos" Binding="{Binding Items.Count}" Width="110" />
+        <DataGridTextColumn Header="Total" Binding="{Binding Total, StringFormat=C0}" Width="150" />
+      </DataGrid.Columns>
+    </DataGrid>
+    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+      <Button Content="Cancelar" Click="Cancel_Click" Margin="0,0,10,0" />
+      <Button Content="Reanudar venta" Click="Resume_Click" Background="#155EEF" Foreground="White" />
+    </StackPanel>
+  </Grid>
+</Window>
