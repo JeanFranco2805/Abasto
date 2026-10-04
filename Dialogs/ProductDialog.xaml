@@ -1,0 +1,64 @@
+<Window x:Class="SupermercadoPOS.Dialogs.ProductDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Producto"
+        Width="560" Height="620" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Background="#F3F5F8"
+        FontFamily="Segoe UI">
+  <Grid Margin="22">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <StackPanel Margin="0,0,0,15">
+      <TextBlock x:Name="TitleText" Text="Producto" FontSize="24" FontWeight="Bold" Foreground="#172B4D" />
+      <TextBlock Text="Catálogo e inventario de la caja local" Foreground="#667085" Margin="0,4,0,0" />
+    </StackPanel>
+    <Border Grid.Row="1" Background="White" CornerRadius="12" Padding="18">
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+          <TextBlock Text="Código de barras" Style="{StaticResource FieldLabel}" />
+          <TextBox x:Name="BarcodeBox" Margin="0,0,0,12" />
+          <TextBlock Text="Nombre del producto" Style="{StaticResource FieldLabel}" />
+          <TextBox x:Name="NameBox" Margin="0,0,0,12" />
+          <TextBlock Text="Categoría" Style="{StaticResource FieldLabel}" />
+          <TextBox x:Name="CategoryBox" Margin="0,0,0,12" />
+          <Grid>
+            <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="14" /><ColumnDefinition /></Grid.ColumnDefinitions>
+            <StackPanel>
+              <TextBlock Text="Unidad" Style="{StaticResource FieldLabel}" />
+              <ComboBox x:Name="UnitBox" SelectedIndex="0">
+                <ComboBoxItem Content="UND" />
+                <ComboBoxItem Content="KG" />
+              </ComboBox>
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+              <TextBlock Text="Precio unitario" Style="{StaticResource FieldLabel}" />
+              <TextBox x:Name="PriceBox" />
+            </StackPanel>
+          </Grid>
+          <Grid Margin="0,12,0,0">
+            <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="14" /><ColumnDefinition /></Grid.ColumnDefinitions>
+            <StackPanel>
+              <TextBlock Text="IVA (%)" Style="{StaticResource FieldLabel}" />
+              <TextBox x:Name="TaxBox" Text="0" />
+            </StackPanel>
+            <StackPanel Grid.Column="2">
+              <TextBlock Text="Existencias" Style="{StaticResource FieldLabel}" />
+              <TextBox x:Name="StockBox" Text="0" />
+            </StackPanel>
+          </Grid>
+          <TextBlock Text="Alerta de inventario cuando queden" Style="{StaticResource FieldLabel}" Margin="0,12,0,5" />
+          <TextBox x:Name="MinimumStockBox" Text="0" />
+          <TextBlock x:Name="ErrorText" Foreground="#B42318" TextWrapping="Wrap" Margin="0,12,0,0" />
+        </StackPanel>
+      </ScrollViewer>
+    </Border>
+    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+      <Button Content="Cancelar" Click="Cancel_Click" Margin="0,0,10,0" />
+      <Button Content="Guardar producto" Click="Save_Click" Background="#155EEF" Foreground="White" />
+    </StackPanel>
+  </Grid>
+</Window>
