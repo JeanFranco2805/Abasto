@@ -1,0 +1,68 @@
+<Window x:Class="SupermercadoPOS.Dialogs.PaymentDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Cobrar venta"
+        Width="650" Height="600" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        Background="#F3F5F8"
+        FontFamily="Segoe UI">
+  <Grid Margin="22">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+      <RowDefinition Height="Auto" />
+    </Grid.RowDefinitions>
+    <StackPanel>
+      <TextBlock Text="Cobro" FontSize="24" FontWeight="Bold" Foreground="#172B4D" />
+      <TextBlock x:Name="TotalText" FontSize="16" Foreground="#667085" Margin="0,4,0,14" />
+    </StackPanel>
+    <Border Grid.Row="1" Background="White" CornerRadius="12" Padding="16" Margin="0,0,0,12">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="200" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <StackPanel Margin="0,0,12,0">
+          <TextBlock Text="Medio de pago" FontSize="12" FontWeight="SemiBold" Foreground="#667085" Margin="0,0,0,5" />
+          <ComboBox x:Name="PaymentMethodBox" SelectedIndex="0">
+            <ComboBoxItem Content="Efectivo" />
+            <ComboBoxItem Content="Tarjeta" />
+            <ComboBoxItem Content="Transferencia" />
+            <ComboBoxItem Content="QR / billetera" />
+          </ComboBox>
+        </StackPanel>
+        <StackPanel Grid.Column="1" Margin="0,0,12,0">
+          <TextBlock Text="Recibido / valor" FontSize="12" FontWeight="SemiBold" Foreground="#667085" Margin="0,0,0,5" />
+          <TextBox x:Name="AmountBox" />
+        </StackPanel>
+        <Button Grid.Column="2" Content="Agregar" VerticalAlignment="Bottom" Click="AddPayment_Click" Background="#E9EEF5" />
+      </Grid>
+    </Border>
+    <DataGrid x:Name="PaymentGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True"
+              CanUserAddRows="False" HeadersVisibility="Column" Background="White"
+              BorderBrush="#EAECF0" RowHeight="38" Margin="0,0,0,12">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Medio" Binding="{Binding Method}" Width="*" />
+        <DataGridTextColumn Header="Aplicado" Binding="{Binding Amount, StringFormat=C0}" Width="130" />
+        <DataGridTextColumn Header="Recibido" Binding="{Binding Tendered, StringFormat=C0}" Width="130" />
+        <DataGridTextColumn Header="Cambio" Binding="{Binding Change, StringFormat=C0}" Width="120" />
+      </DataGrid.Columns>
+    </DataGrid>
+    <Grid Grid.Row="3">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+      <StackPanel VerticalAlignment="Center">
+        <TextBlock x:Name="RemainingText" FontSize="20" FontWeight="Bold" Foreground="#B42318" />
+        <TextBlock Text="Pendiente de pago" FontSize="12" Foreground="#667085" />
+      </StackPanel>
+      <Button Grid.Column="1" Content="Cancelar" Click="Cancel_Click" Margin="0,0,10,0" />
+      <Button x:Name="CompleteButton" Grid.Column="2" Content="Confirmar cobro" Click="Complete_Click"
+              Background="#155EEF" Foreground="White" IsEnabled="False" />
+    </Grid>
+  </Grid>
+</Window>
