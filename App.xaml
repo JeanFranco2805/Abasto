@@ -103,32 +103,59 @@
     </Style>
     <Style TargetType="DataGrid">
       <Setter Property="Background" Value="White" />
-      <Setter Property="BorderBrush" Value="#EAECF0" />
+      <Setter Property="BorderBrush" Value="#DCE4EF" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="GridLinesVisibility" Value="Horizontal" />
-      <Setter Property="HorizontalGridLinesBrush" Value="#EAECF0" />
-      <Setter Property="VerticalGridLinesBrush" Value="#EAECF0" />
+      <Setter Property="HorizontalGridLinesBrush" Value="#E8EDF4" />
+      <Setter Property="VerticalGridLinesBrush" Value="#E8EDF4" />
       <Setter Property="RowBackground" Value="White" />
-      <Setter Property="AlternatingRowBackground" Value="#F8FAFC" />
+      <Setter Property="AlternatingRowBackground" Value="#F7F9FC" />
       <Setter Property="AlternationCount" Value="2" />
+      <Setter Property="ColumnHeaderHeight" Value="44" />
+      <Setter Property="RowHeaderWidth" Value="0" />
+      <Setter Property="HeadersVisibility" Value="Column" />
     </Style>
     <Style TargetType="DataGridColumnHeader">
-      <Setter Property="Background" Value="#F8FAFC" />
-      <Setter Property="Foreground" Value="#344054" />
+      <Setter Property="Background" Value="#142D4A" />
+      <Setter Property="Foreground" Value="#FFFFFF" />
       <Setter Property="FontWeight" Value="SemiBold" />
-      <Setter Property="Padding" Value="10,8" />
-      <Setter Property="BorderBrush" Value="#EAECF0" />
-      <Setter Property="BorderThickness" Value="0,0,0,1" />
+      <Setter Property="Padding" Value="13,10" />
+      <Setter Property="BorderBrush" Value="#294666" />
+      <Setter Property="BorderThickness" Value="0,0,1,0" />
+      <Setter Property="HorizontalContentAlignment" Value="Left" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Style.Triggers>
+        <Trigger Property="IsMouseOver" Value="True">
+          <Setter Property="Background" Value="#1C4268" />
+        </Trigger>
+      </Style.Triggers>
     </Style>
     <Style TargetType="DataGridRow">
       <Setter Property="Foreground" Value="#344054" />
-      <Setter Property="MinHeight" Value="34" />
-      <Setter Property="BorderBrush" Value="#F2F4F7" />
+      <Setter Property="MinHeight" Value="42" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Setter Property="BorderBrush" Value="#E8EDF4" />
       <Setter Property="BorderThickness" Value="0,0,0,1" />
       <Style.Triggers>
+        <Trigger Property="IsMouseOver" Value="True">
+          <Setter Property="Background" Value="#F1F6FF" />
+        </Trigger>
         <Trigger Property="IsSelected" Value="True">
-          <Setter Property="Background" Value="#EAF1FF" />
+          <Setter Property="Background" Value="#E8F0FF" />
           <Setter Property="Foreground" Value="#172B4D" />
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+    <Style TargetType="DataGridCell">
+      <Setter Property="Padding" Value="10,7" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="Foreground" Value="#344054" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+      <Style.Triggers>
+        <Trigger Property="IsSelected" Value="True">
+          <Setter Property="Background" Value="#DCE9FF" />
+          <Setter Property="Foreground" Value="#173A5E" />
         </Trigger>
       </Style.Triggers>
     </Style>
