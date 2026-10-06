@@ -792,12 +792,12 @@ public partial class MainWindow : Window
 
 public sealed class InventoryProductCard(Product product)
 {
-    private static readonly Brush EmptyBackground = CreateBrush(0xFE, 0xF3, 0xF2);
-    private static readonly Brush EmptyForeground = CreateBrush(0xB4, 0x23, 0x18);
-    private static readonly Brush LowBackground = CreateBrush(0xFF, 0xFA, 0xEB);
-    private static readonly Brush LowForeground = CreateBrush(0xB5, 0x47, 0x08);
-    private static readonly Brush AvailableBackground = CreateBrush(0xEC, 0xFD, 0xF3);
-    private static readonly Brush AvailableForeground = CreateBrush(0x02, 0x7A, 0x48);
+    private static readonly Brush EmptyBackground = CreateBrush(0x49, 0x2A, 0x30);
+    private static readonly Brush EmptyForeground = CreateBrush(0xFF, 0xB4, 0xAB);
+    private static readonly Brush LowBackground = CreateBrush(0x43, 0x36, 0x24);
+    private static readonly Brush LowForeground = CreateBrush(0xFF, 0xD1, 0x8B);
+    private static readonly Brush AvailableBackground = CreateBrush(0x1C, 0x3D, 0x38);
+    private static readonly Brush AvailableForeground = CreateBrush(0x75, 0xE0, 0xA7);
 
     public Product Product { get; } = product;
     public string Name => Product.Name;
