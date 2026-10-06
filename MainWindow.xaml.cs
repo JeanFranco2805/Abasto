@@ -184,7 +184,14 @@ public partial class MainWindow : Window
         DiscountText.Text = discount.ToString("C0");
         TaxText.Text = tax.ToString("C0");
         TotalText.Text = total.ToString("C0");
-        CartCountText.Text = $"{Cart.Sum(line => line.Quantity):N3} unidad(es) · {Cart.Count} producto(s)";
+        if (Cart.Count == 0)
+            CartCountText.Text = "Venta vacía · lista para empezar";
+        else
+        {
+            var quantity = Cart.Sum(line => line.Quantity);
+            var productLabel = Cart.Count == 1 ? "producto" : "productos";
+            CartCountText.Text = $"{quantity:0.###} unidades · {Cart.Count} {productLabel}";
+        }
     }
 
     private async void Charge_Click(object sender, RoutedEventArgs e)
