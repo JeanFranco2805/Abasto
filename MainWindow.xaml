@@ -374,53 +374,261 @@
         <Grid Margin="12">
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
           </Grid.RowDefinitions>
-          <Grid Margin="0,0,0,12">
-            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+          <Grid Margin="0,0,0,14">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
             <StackPanel>
-              <TextBlock Text="Inventario y catálogo" FontSize="21" FontWeight="Bold" Foreground="#172B4D" />
-              <TextBlock x:Name="InventorySummaryText" Foreground="#667085" FontSize="12" Margin="0,3,0,0" />
+              <TextBlock Text="Inventario y catálogo" FontSize="23" FontWeight="Bold" Foreground="#172B4D" />
+              <TextBlock x:Name="InventorySummaryText" Foreground="#667085" FontSize="13" Margin="0,4,0,0" />
             </StackPanel>
-            <Grid Grid.Column="1" Width="240" VerticalAlignment="Center">
-              <TextBox x:Name="InventorySearchBox" ToolTip="Filtrar por nombre, código o categoría"
-                       TextChanged="InventorySearch_TextChanged" />
-              <TextBlock Text="Buscar producto..." Foreground="#98A2B3" Margin="12,0,8,0"
-                         VerticalAlignment="Center" IsHitTestVisible="False">
-                <TextBlock.Style>
-                  <Style TargetType="TextBlock">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                    <Style.Triggers>
-                      <DataTrigger Binding="{Binding Text, ElementName=InventorySearchBox}" Value="">
-                        <Setter Property="Visibility" Value="Visible" />
-                      </DataTrigger>
-                    </Style.Triggers>
-                  </Style>
-                </TextBlock.Style>
-              </TextBlock>
-            </Grid>
-            <Button Grid.Column="2" Content="Editar seleccionado" Click="EditProduct_Click" Margin="10,0,0,0" />
-            <Button Grid.Column="3" Content="Nuevo producto" Click="NewProduct_Click"
+            <Button x:Name="EditInventoryButton" Grid.Column="1" Content="Editar producto"
+                    Click="EditProduct_Click" IsEnabled="False" Margin="10,0,0,0" />
+            <Button Grid.Column="2" Content="＋  Nuevo producto" Click="NewProduct_Click"
                     Background="#155EEF" Foreground="White" Margin="10,0,0,0" />
           </Grid>
-          <DataGrid x:Name="InventoryGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True"
-                    CanUserAddRows="False" SelectionMode="Single" HeadersVisibility="Column"
-                    Background="White" BorderBrush="#EAECF0" RowHeight="40">
-            <DataGrid.Columns>
-              <DataGridTextColumn Header="Código" Binding="{Binding Barcode}" Width="150" />
-              <DataGridTextColumn Header="Producto" Binding="{Binding Name}" Width="*" />
-              <DataGridTextColumn Header="Categoría" Binding="{Binding Category}" Width="140" />
-              <DataGridTextColumn Header="Unidad" Binding="{Binding Unit}" Width="75" />
-              <DataGridTextColumn Header="Precio" Binding="{Binding UnitPrice, StringFormat=C0}" Width="130" />
-              <DataGridTextColumn Header="Existencias" Binding="{Binding Stock, StringFormat=N3}" Width="120" />
-              <DataGridTextColumn Header="Mínimo" Binding="{Binding MinimumStock, StringFormat=N3}" Width="100" />
-            </DataGrid.Columns>
-            <DataGrid.ContextMenu>
-              <ContextMenu>
-                <MenuItem Header="Editar producto" Click="EditProduct_Click" />
-              </ContextMenu>
-            </DataGrid.ContextMenu>
-          </DataGrid>
+          <Border Grid.Row="1" Background="White" BorderBrush="#E6EBF3" BorderThickness="1"
+                  CornerRadius="13" Padding="12" Margin="0,0,0,14">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2.1*" />
+                <ColumnDefinition Width="1.25*" />
+                <ColumnDefinition Width="1.2*" />
+                <ColumnDefinition Width="1.2*" />
+                <ColumnDefinition Width="Auto" />
+              </Grid.ColumnDefinitions>
+              <Grid Margin="0,0,8,0">
+                <TextBox x:Name="InventorySearchBox" Padding="13,10" ToolTip="Buscar por nombre, código o categoría"
+                         TextChanged="InventorySearch_TextChanged" />
+                <TextBlock Text="⌕  Buscar producto, código o categoría" Foreground="#98A2B3"
+                           Margin="13,0,8,0" VerticalAlignment="Center" IsHitTestVisible="False">
+                  <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                      <Setter Property="Visibility" Value="Collapsed" />
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding Text, ElementName=InventorySearchBox}" Value="">
+                          <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </TextBlock.Style>
+                </TextBlock>
+              </Grid>
+              <ComboBox x:Name="InventoryCategoryFilterBox" Grid.Column="1" Margin="8,0" Padding="10,8"
+                        ItemsSource="{Binding InventoryCategories}" SelectedIndex="0"
+                        SelectionChanged="InventoryFilters_SelectionChanged" ToolTip="Filtrar por categoría" />
+              <ComboBox x:Name="InventoryStockFilterBox" Grid.Column="2" Margin="8,0" Padding="10,8"
+                        SelectedIndex="0" SelectionChanged="InventoryFilters_SelectionChanged"
+                        ToolTip="Filtrar por nivel de existencias">
+                <ComboBoxItem Content="Todos los niveles" Tag="all" />
+                <ComboBoxItem Content="Existencias bajas" Tag="low" />
+                <ComboBoxItem Content="Sin existencias" Tag="empty" />
+                <ComboBoxItem Content="Stock suficiente" Tag="available" />
+              </ComboBox>
+              <ComboBox x:Name="InventorySortBox" Grid.Column="3" Margin="8,0" Padding="10,8"
+                        SelectedIndex="0" SelectionChanged="InventoryFilters_SelectionChanged"
+                        ToolTip="Ordenar productos">
+                <ComboBoxItem Content="Nombre: A a Z" Tag="name" />
+                <ComboBoxItem Content="Precio: menor primero" Tag="price-asc" />
+                <ComboBoxItem Content="Precio: mayor primero" Tag="price-desc" />
+                <ComboBoxItem Content="Menor existencia" Tag="stock-asc" />
+              </ComboBox>
+              <Button Grid.Column="4" Content="Limpiar" Click="ClearInventoryFilters_Click"
+                      Margin="8,0,0,0" Padding="12,9" />
+            </Grid>
+          </Border>
+
+          <Grid Grid.Row="2">
+            <ListBox x:Name="InventoryCardsList" ItemsSource="{Binding InventoryProducts}"
+                     Background="Transparent" BorderThickness="0" SelectionMode="Single"
+                     SelectionChanged="InventoryCardsList_SelectionChanged"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     VirtualizingPanel.IsVirtualizing="False">
+              <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <WrapPanel />
+                </ItemsPanelTemplate>
+              </ListBox.ItemsPanel>
+              <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem">
+                  <Setter Property="Width" Value="344" />
+                  <Setter Property="MinHeight" Value="205" />
+                  <Setter Property="Margin" Value="0,0,14,14" />
+                  <Setter Property="Padding" Value="0" />
+                  <Setter Property="Background" Value="Transparent" />
+                  <Setter Property="BorderThickness" Value="0" />
+                  <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                  <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                  <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                  <Setter Property="Template">
+                    <Setter.Value>
+                      <ControlTemplate TargetType="ListBoxItem">
+                        <Grid x:Name="CardSurface" Opacity="0" RenderTransformOrigin="0.5,0.5">
+                          <Grid.RenderTransform>
+                            <TransformGroup>
+                              <ScaleTransform x:Name="CardScale" ScaleX="1" ScaleY="1" />
+                              <TranslateTransform x:Name="CardOffset" Y="10" />
+                            </TransformGroup>
+                          </Grid.RenderTransform>
+                          <Border x:Name="CardBorder" Background="White" BorderBrush="#E4EAF2"
+                                  BorderThickness="1" CornerRadius="15" Padding="16">
+                            <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                          </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                          <EventTrigger RoutedEvent="Loaded">
+                            <BeginStoryboard>
+                              <Storyboard>
+                                <DoubleAnimation Storyboard.TargetName="CardSurface" Storyboard.TargetProperty="Opacity"
+                                                 From="0" To="1" Duration="0:0:0.24" />
+                                <DoubleAnimation Storyboard.TargetName="CardOffset" Storyboard.TargetProperty="Y"
+                                                 From="10" To="0" Duration="0:0:0.24" />
+                              </Storyboard>
+                            </BeginStoryboard>
+                          </EventTrigger>
+                          <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="CardBorder" Property="BorderBrush" Value="#9CB9F5" />
+                            <Setter TargetName="CardBorder" Property="Effect">
+                              <Setter.Value>
+                                <DropShadowEffect Color="#456AA5" BlurRadius="18" ShadowDepth="4" Opacity="0.13" />
+                              </Setter.Value>
+                            </Setter>
+                            <Trigger.EnterActions>
+                              <BeginStoryboard>
+                                <Storyboard>
+                                  <DoubleAnimation Storyboard.TargetName="CardScale" Storyboard.TargetProperty="ScaleX"
+                                                   To="1.018" Duration="0:0:0.15" />
+                                  <DoubleAnimation Storyboard.TargetName="CardScale" Storyboard.TargetProperty="ScaleY"
+                                                   To="1.018" Duration="0:0:0.15" />
+                                </Storyboard>
+                              </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                              <BeginStoryboard>
+                                <Storyboard>
+                                  <DoubleAnimation Storyboard.TargetName="CardScale" Storyboard.TargetProperty="ScaleX"
+                                                   To="1" Duration="0:0:0.15" />
+                                  <DoubleAnimation Storyboard.TargetName="CardScale" Storyboard.TargetProperty="ScaleY"
+                                                   To="1" Duration="0:0:0.15" />
+                                </Storyboard>
+                              </BeginStoryboard>
+                            </Trigger.ExitActions>
+                          </Trigger>
+                          <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="CardBorder" Property="BorderBrush" Value="#155EEF" />
+                            <Setter TargetName="CardBorder" Property="BorderThickness" Value="2" />
+                            <Setter TargetName="CardBorder" Property="Background" Value="#F8FAFF" />
+                          </Trigger>
+                        </ControlTemplate.Triggers>
+                      </ControlTemplate>
+                    </Setter.Value>
+                  </Setter>
+                </Style>
+              </ListBox.ItemContainerStyle>
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <Grid>
+                    <Grid.RowDefinitions>
+                      <RowDefinition Height="Auto" />
+                      <RowDefinition Height="*" />
+                      <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid>
+                      <Border Background="#F2F4F7" CornerRadius="8" Padding="9,5" HorizontalAlignment="Left">
+                        <TextBlock Text="{Binding Category}" FontSize="11" FontWeight="SemiBold" Foreground="#475467" />
+                      </Border>
+                      <Border Background="{Binding StockStatusBackground}" CornerRadius="8" Padding="9,5"
+                              HorizontalAlignment="Right">
+                        <StackPanel Orientation="Horizontal">
+                          <Ellipse Width="6" Height="6" Fill="{Binding StockStatusForeground}"
+                                   VerticalAlignment="Center" Margin="0,0,6,0" />
+                          <TextBlock Text="{Binding StockStatus}" FontSize="10" FontWeight="Bold"
+                                     Foreground="{Binding StockStatusForeground}" />
+                        </StackPanel>
+                      </Border>
+                    </Grid>
+                    <StackPanel Grid.Row="1" Margin="0,13,0,12" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Name}" FontSize="17" FontWeight="Bold" Foreground="#172B4D"
+                                 TextWrapping="Wrap" MaxHeight="46" TextTrimming="CharacterEllipsis" />
+                      <StackPanel Orientation="Horizontal" Margin="0,7,0,0">
+                        <TextBlock Text="&#xE8EC;" FontFamily="Segoe MDL2 Assets" FontSize="12"
+                                   Foreground="#98A2B3" Margin="0,0,6,0" />
+                        <TextBlock Text="{Binding Barcode}" FontSize="12" Foreground="#667085" />
+                      </StackPanel>
+                    </StackPanel>
+                    <Grid Grid.Row="2" Margin="0,9,0,0">
+                      <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                      <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="PRECIO UNITARIO" FontSize="9" FontWeight="Bold" Foreground="#98A2B3" />
+                        <TextBlock Text="{Binding UnitPrice, StringFormat={}{0:C0}}" FontSize="20"
+                                   FontWeight="Bold" Foreground="#155EEF" Margin="0,2,0,0" />
+                      </StackPanel>
+                      <Border Grid.Column="1" Background="#F4F7FB" CornerRadius="10" Padding="11,8"
+                              VerticalAlignment="Center">
+                        <StackPanel>
+                          <TextBlock Text="EXISTENCIAS" FontSize="9" FontWeight="Bold" Foreground="#98A2B3" />
+                          <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                            <TextBlock Text="{Binding Stock, StringFormat={}{0:N3}}" FontSize="13"
+                                       FontWeight="Bold" Foreground="#344054" />
+                            <TextBlock Text="{Binding Unit}" FontSize="11" Foreground="#667085"
+                                       VerticalAlignment="Center" Margin="5,0,0,0" />
+                          </StackPanel>
+                          <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                            <TextBlock Text="Mín." FontSize="10" Foreground="#98A2B3" />
+                            <TextBlock Text="{Binding MinimumStock, StringFormat={}{0:N3}}" FontSize="10"
+                                       Foreground="#667085" Margin="4,0,0,0" />
+                          </StackPanel>
+                        </StackPanel>
+                      </Border>
+                    </Grid>
+                  </Grid>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+
+            <Border x:Name="InventoryEmptyStatePanel" Background="#F3F5F8" Visibility="Collapsed"
+                    IsHitTestVisible="False">
+              <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="380">
+                <Border Width="58" Height="58" Background="#E8F0FF" CornerRadius="18"
+                        HorizontalAlignment="Center" Margin="0,0,0,16">
+                  <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" FontSize="24" Foreground="#155EEF"
+                             HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+                <TextBlock Text="No encontramos productos" FontSize="18" FontWeight="Bold" Foreground="#172B4D"
+                           HorizontalAlignment="Center" />
+                <TextBlock Text="Prueba con otra búsqueda o cambia los filtros para ver más resultados."
+                           FontSize="13" Foreground="#667085" TextWrapping="Wrap" TextAlignment="Center"
+                           Margin="0,7,0,0" />
+              </StackPanel>
+            </Border>
+          </Grid>
+
+          <Grid Grid.Row="3" Margin="2,12,2,0">
+            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+            <TextBlock x:Name="InventoryRangeText" Foreground="#667085" FontSize="12"
+                       VerticalAlignment="Center" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+              <TextBlock Text="Productos por página" Foreground="#667085" FontSize="12"
+                         VerticalAlignment="Center" Margin="0,0,8,0" />
+              <ComboBox x:Name="InventoryPageSizeBox" Width="78" SelectedIndex="0" Margin="0,0,14,0"
+                        SelectionChanged="InventoryPageSize_SelectionChanged" ToolTip="Tamaño de página">
+                <ComboBoxItem Content="8" Tag="8" />
+                <ComboBoxItem Content="12" Tag="12" />
+                <ComboBoxItem Content="20" Tag="20" />
+              </ComboBox>
+              <Button x:Name="InventoryPreviousPageButton" Content="‹" Width="40" Padding="8,6"
+                      Click="InventoryPreviousPage_Click" ToolTip="Página anterior" />
+              <Border Background="#EAF1FF" CornerRadius="8" Padding="13,8" Margin="8,0">
+                <TextBlock x:Name="InventoryPageText" Foreground="#155EEF" FontWeight="SemiBold"
+                           FontSize="12" VerticalAlignment="Center" />
+              </Border>
+              <Button x:Name="InventoryNextPageButton" Content="›" Width="40" Padding="8,6"
+                      Click="InventoryNextPage_Click" ToolTip="Página siguiente" />
+            </StackPanel>
+          </Grid>
         </Grid>
       </TabItem>
 
