@@ -47,8 +47,8 @@
               <TextBlock Text="HECHO PARA EL DÍA A DÍA" FontSize="10" FontWeight="Bold"
                          Foreground="#E5F0FF" />
             </Border>
-            <TextBlock Text="Tu tienda,\nsiempre en marcha." FontSize="34" FontWeight="Bold"
-                       Foreground="White" LineHeight="40" TextWrapping="Wrap" />
+            <TextBlock Text="Tu tienda en marcha" FontSize="34" FontWeight="Bold"
+                       Foreground="White" TextWrapping="NoWrap" />
             <TextBlock Text="Atiende más rápido y mantén el control de cada movimiento desde una sola caja."
                        FontSize="15" Foreground="#D2E2F1" TextWrapping="Wrap" LineHeight="23"
                        Margin="0,14,0,24" />
@@ -116,8 +116,8 @@
 
         <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,16,0,20">
           <TextBlock Text="Iniciar sesión" FontSize="30" FontWeight="Bold" Foreground="#172B4D" />
-          <TextBlock Text="Ingresa tus credenciales para abrir el punto de venta."
-                     FontSize="14" Foreground="#667085" TextWrapping="Wrap" Margin="0,7,0,27" />
+          <TextBlock Text="Ingresa tu usuario y PIN para continuar."
+                     FontSize="14" Foreground="#667085" TextWrapping="NoWrap" Margin="0,7,0,27" />
 
           <TextBlock Text="Usuario" FontSize="13" FontWeight="SemiBold" Foreground="#344054" Margin="0,0,0,7" />
           <TextBox x:Name="UsernameBox" Text="cajero" FontSize="15" Padding="14,12"
