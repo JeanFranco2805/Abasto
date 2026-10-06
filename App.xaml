@@ -92,9 +92,9 @@
     </Style>
     <Style x:Key="SidebarTabItemStyle" TargetType="TabItem">
       <Setter Property="Width" Value="216" />
-      <Setter Property="Margin" Value="0,3" />
-      <Setter Property="Padding" Value="6,4" />
-      <Setter Property="Foreground" Value="#C5D4E4" />
+      <Setter Property="Margin" Value="0,4" />
+      <Setter Property="Padding" Value="7,5" />
+      <Setter Property="Foreground" Value="#475467" />
       <Setter Property="FontSize" Value="14" />
       <Setter Property="FontWeight" Value="SemiBold" />
       <Setter Property="Cursor" Value="Hand" />
@@ -104,7 +104,7 @@
         <Setter.Value>
           <ControlTemplate TargetType="TabItem">
             <Border x:Name="TabBorder" Background="Transparent" BorderBrush="Transparent"
-                    BorderThickness="1" CornerRadius="12" Padding="{TemplateBinding Padding}">
+                    BorderThickness="1" CornerRadius="11" Padding="{TemplateBinding Padding}">
               <Grid>
                 <Grid.ColumnDefinitions>
                   <ColumnDefinition Width="3" />
@@ -112,10 +112,10 @@
                   <ColumnDefinition Width="*" />
                   <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Border x:Name="SelectionMark" Background="#9DC0FF" CornerRadius="2"
+                <Border x:Name="SelectionMark" Background="#155EEF" CornerRadius="2"
                         Margin="0,5" Visibility="Collapsed" />
                 <Border x:Name="IconShell" Grid.Column="1" Width="36" Height="36"
-                        Background="#1EFFFFFF" CornerRadius="10" Margin="0,0,11,0">
+                        Background="#E1E8F0" CornerRadius="10" Margin="0,0,11,0">
                   <TextBlock Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
                              FontFamily="Segoe MDL2 Assets" FontSize="16"
                              Foreground="{TemplateBinding Foreground}"
@@ -124,26 +124,32 @@
                 <ContentPresenter Grid.Column="2" ContentSource="Header" VerticalAlignment="Center"
                                   HorizontalAlignment="Left" />
                 <TextBlock x:Name="TabChevron" Grid.Column="3" Text="&#xE76C;"
-                           FontFamily="Segoe MDL2 Assets" FontSize="10" Foreground="White"
+                           FontFamily="Segoe MDL2 Assets" FontSize="10" Foreground="#155EEF"
                            VerticalAlignment="Center" Margin="8,0,5,0" Opacity="0" />
               </Grid>
             </Border>
             <ControlTemplate.Triggers>
               <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="TabBorder" Property="Background" Value="#203E5F" />
-                <Setter TargetName="IconShell" Property="Background" Value="#2A4B6D" />
-                <Setter Property="Foreground" Value="White" />
+                <Setter TargetName="TabBorder" Property="Background" Value="#F8FAFC" />
+                <Setter TargetName="TabBorder" Property="BorderBrush" Value="#E3EAF2" />
+                <Setter TargetName="IconShell" Property="Background" Value="#D7E4F3" />
+                <Setter Property="Foreground" Value="#172B4D" />
               </Trigger>
               <Trigger Property="IsKeyboardFocused" Value="True">
-                <Setter TargetName="TabBorder" Property="BorderBrush" Value="#6EA3FF" />
+                <Setter TargetName="TabBorder" Property="BorderBrush" Value="#84ADFF" />
               </Trigger>
               <Trigger Property="IsSelected" Value="True">
-                <Setter TargetName="TabBorder" Property="Background" Value="#155EEF" />
-                <Setter TargetName="TabBorder" Property="BorderBrush" Value="#4A83FF" />
-                <Setter TargetName="IconShell" Property="Background" Value="#35FFFFFF" />
+                <Setter TargetName="TabBorder" Property="Background" Value="White" />
+                <Setter TargetName="TabBorder" Property="BorderBrush" Value="#DCE6F3" />
+                <Setter TargetName="TabBorder" Property="Effect">
+                  <Setter.Value>
+                    <DropShadowEffect Color="#243B5A" BlurRadius="12" ShadowDepth="2" Opacity="0.08" />
+                  </Setter.Value>
+                </Setter>
+                <Setter TargetName="IconShell" Property="Background" Value="#155EEF" />
                 <Setter TargetName="SelectionMark" Property="Visibility" Value="Visible" />
-                <Setter TargetName="TabChevron" Property="Opacity" Value="0.9" />
-                <Setter Property="Foreground" Value="White" />
+                <Setter TargetName="TabChevron" Property="Opacity" Value="0.8" />
+                <Setter Property="Foreground" Value="#142B49" />
               </Trigger>
               <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Opacity" Value="0.48" />
@@ -164,14 +170,8 @@
                 <ColumnDefinition Width="252" />
                 <ColumnDefinition Width="*" />
               </Grid.ColumnDefinitions>
-              <Border Grid.Column="0" CornerRadius="17" Margin="0,0,14,0">
-                <Border.Background>
-                  <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#142B49" Offset="0" />
-                    <GradientStop Color="#0F223A" Offset="1" />
-                  </LinearGradientBrush>
-                </Border.Background>
-              </Border>
+              <Border Grid.Column="0" Background="#E9EEF4" BorderBrush="#E0E6EE" BorderThickness="1"
+                      CornerRadius="17" Margin="0,0,14,0" />
               <Grid Grid.Column="0" Margin="10,15,26,14">
                 <Grid.RowDefinitions>
                   <RowDefinition Height="Auto" />
@@ -179,37 +179,40 @@
                   <RowDefinition Height="*" />
                   <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="8,2,8,25">
-                  <Border Width="40" Height="40" CornerRadius="12" Margin="0,0,11,0">
-                    <Border.Background>
-                      <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                        <GradientStop Color="#3979F6" Offset="0" />
-                        <GradientStop Color="#155EEF" Offset="1" />
-                      </LinearGradientBrush>
-                    </Border.Background>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="8,2,8,24">
+                  <Border Width="42" Height="42" Background="#142B49" BorderBrush="#FFFFFF"
+                          BorderThickness="2" CornerRadius="13" Margin="0,0,11,0">
                     <TextBlock Text="&#xE7BF;" FontFamily="Segoe MDL2 Assets" FontSize="18"
                                Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
                   </Border>
                   <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="GESTIÓN" FontSize="10" FontWeight="Bold" Foreground="#91A9C3" />
-                    <TextBlock Text="Menú principal" FontSize="13" FontWeight="SemiBold"
-                               Foreground="White" Margin="0,2,0,0" />
+                    <TextBlock Text="TU TIENDA" FontSize="10" FontWeight="Bold" Foreground="#155EEF" />
+                    <TextBlock Text="Gestión diaria" FontSize="14" FontWeight="Bold"
+                               Foreground="#142B49" Margin="0,2,0,0" />
                   </StackPanel>
                 </StackPanel>
-                <TextBlock Grid.Row="1" Text="SECCIONES" FontSize="10" FontWeight="Bold"
-                           Foreground="#829AB4" Margin="11,0,0,8" />
+                <TextBlock Grid.Row="1" Text="IR A" FontSize="10" FontWeight="Bold"
+                           Foreground="#7A8798" Margin="11,0,0,8" />
                 <TabPanel Grid.Row="2" IsItemsHost="True" KeyboardNavigation.TabIndex="1"
                           VerticalAlignment="Top" />
-                <Border Grid.Row="3" Background="#1AFFFFFF" BorderBrush="#2B4968" BorderThickness="1"
+                <Border Grid.Row="3" Background="White" BorderBrush="#DCE4ED" BorderThickness="1"
                         CornerRadius="12" Padding="11,10" Margin="3,12,3,1">
-                  <StackPanel Orientation="Horizontal">
-                    <Ellipse Width="8" Height="8" Fill="#32D583" VerticalAlignment="Top" Margin="1,4,9,0" />
-                    <StackPanel>
-                      <TextBlock Text="CAJA LOCAL" FontSize="10" FontWeight="Bold" Foreground="White" />
-                      <TextBlock Text="Operación disponible" FontSize="11" Foreground="#B7C6D8"
-                                 Margin="0,3,0,0" />
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto" />
+                      <ColumnDefinition Width="*" />
+                      <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Border Width="28" Height="28" Background="#EAF1FF" CornerRadius="9" Margin="0,0,9,0">
+                      <TextBlock Text="&#xE7BF;" FontFamily="Segoe MDL2 Assets" FontSize="13"
+                                 Foreground="#155EEF" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                      <TextBlock Text="OPERACIÓN DIARIA" FontSize="9" FontWeight="Bold" Foreground="#7A8798" />
+                      <TextBlock Text="Caja · ventas · inventario" FontSize="11" FontWeight="SemiBold"
+                                 Foreground="#142B49" Margin="0,2,0,0" />
                     </StackPanel>
-                  </StackPanel>
+                  </Grid>
                 </Border>
               </Grid>
               <ContentPresenter x:Name="PART_SelectedContentHost" Grid.Column="1"
