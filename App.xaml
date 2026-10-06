@@ -3,26 +3,26 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              ShutdownMode="OnExplicitShutdown">
   <Application.Resources>
-    <SolidColorBrush x:Key="AccentBrush" Color="#4F8CFF" />
-    <SolidColorBrush x:Key="InkBrush" Color="#F0F4F8" />
-    <SolidColorBrush x:Key="MutedBrush" Color="#A8B5C5" />
-    <SolidColorBrush x:Key="PanelBrush" Color="#152438" />
-    <SolidColorBrush x:Key="CanvasBrush" Color="#0D1724" />
-    <SolidColorBrush x:Key="InputBrush" Color="#101E30" />
-    <SolidColorBrush x:Key="LineBrush" Color="#2B3D53" />
+    <SolidColorBrush x:Key="AccentBrush" Color="#36A995" />
+    <SolidColorBrush x:Key="InkBrush" Color="#EEF2EF" />
+    <SolidColorBrush x:Key="MutedBrush" Color="#A1AEAB" />
+    <SolidColorBrush x:Key="PanelBrush" Color="#1A252A" />
+    <SolidColorBrush x:Key="CanvasBrush" Color="#11191E" />
+    <SolidColorBrush x:Key="InputBrush" Color="#141D21" />
+    <SolidColorBrush x:Key="LineBrush" Color="#303A3D" />
     <Style TargetType="Window">
       <Setter Property="Background" Value="{StaticResource CanvasBrush}" />
-      <Setter Property="Foreground" Value="#D6E0EB" />
+      <Setter Property="Foreground" Value="#CBD5D2" />
       <Setter Property="FontFamily" Value="Segoe UI" />
     </Style>
     <Style TargetType="Button">
-      <Setter Property="Padding" Value="14,10" />
-      <Setter Property="FontSize" Value="14" />
-      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Padding" Value="13,9" />
+      <Setter Property="FontSize" Value="13" />
+      <Setter Property="FontWeight" Value="Medium" />
       <Setter Property="Cursor" Value="Hand" />
-      <Setter Property="Background" Value="#20344B" />
-      <Setter Property="Foreground" Value="#EBF2FA" />
-      <Setter Property="BorderBrush" Value="#324963" />
+      <Setter Property="Background" Value="#253439" />
+      <Setter Property="Foreground" Value="#E6ECE9" />
+      <Setter Property="BorderBrush" Value="#354246" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
       <Setter Property="Template">
@@ -30,20 +30,20 @@
           <ControlTemplate TargetType="Button">
             <Border x:Name="ButtonBorder" Background="{TemplateBinding Background}"
                     BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}"
-                    CornerRadius="8" Padding="{TemplateBinding Padding}">
+                    CornerRadius="5" Padding="{TemplateBinding Padding}">
               <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                 VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
             </Border>
             <ControlTemplate.Triggers>
               <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.88" />
+                <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.94" />
               </Trigger>
               <Trigger Property="IsPressed" Value="True">
-                <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.74" />
+                <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.84" />
               </Trigger>
               <Trigger Property="IsKeyboardFocused" Value="True">
-                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#84ADFF" />
-                <Setter TargetName="ButtonBorder" Property="BorderThickness" Value="2" />
+                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#71CABB" />
+                <Setter TargetName="ButtonBorder" Property="BorderThickness" Value="1" />
               </Trigger>
               <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.45" />
@@ -59,23 +59,23 @@
     </Style>
     <Style TargetType="TabItem">
       <Setter Property="Width" Value="218" />
-      <Setter Property="Padding" Value="15,13" />
-      <Setter Property="Margin" Value="5,3" />
-      <Setter Property="Foreground" Value="#B7C6D8" />
+      <Setter Property="Padding" Value="13,11" />
+      <Setter Property="Margin" Value="4,2" />
+      <Setter Property="Foreground" Value="#AFBCB9" />
       <Setter Property="FontSize" Value="14" />
       <Setter Property="FontWeight" Value="SemiBold" />
       <Setter Property="HorizontalContentAlignment" Value="Stretch" />
       <Setter Property="Template">
         <Setter.Value>
           <ControlTemplate TargetType="TabItem">
-            <Border x:Name="TabBorder" Background="Transparent" CornerRadius="9" Padding="{TemplateBinding Padding}">
+            <Border x:Name="TabBorder" Background="Transparent" CornerRadius="5" Padding="{TemplateBinding Padding}">
               <Grid>
                 <Grid.ColumnDefinitions>
                   <ColumnDefinition Width="3" />
                   <ColumnDefinition Width="Auto" />
                   <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Border x:Name="SelectionMark" Background="#155EEF" CornerRadius="2" Margin="0,4" Visibility="Collapsed" />
+                <Border x:Name="SelectionMark" Background="#36A995" CornerRadius="2" Margin="0,4" Visibility="Collapsed" />
                 <TextBlock Grid.Column="1" Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
                            FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="{TemplateBinding Foreground}"
                            VerticalAlignment="Center" Margin="11,0,11,0" />
@@ -85,12 +85,12 @@
             </Border>
             <ControlTemplate.Triggers>
               <Trigger Property="IsSelected" Value="True">
-                <Setter TargetName="TabBorder" Property="Background" Value="#1C3452" />
+                <Setter TargetName="TabBorder" Property="Background" Value="#263A3A" />
                 <Setter TargetName="SelectionMark" Property="Visibility" Value="Visible" />
-                <Setter Property="Foreground" Value="#8AB4FF" />
+                <Setter Property="Foreground" Value="#71CABB" />
               </Trigger>
               <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="TabBorder" Property="Background" Value="#1B2D42" />
+                <Setter TargetName="TabBorder" Property="Background" Value="#263237" />
               </Trigger>
             </ControlTemplate.Triggers>
           </ControlTemplate>
@@ -98,10 +98,10 @@
       </Setter>
     </Style>
     <Style x:Key="SidebarTabItemStyle" TargetType="TabItem">
-      <Setter Property="Width" Value="216" />
-      <Setter Property="Margin" Value="0,2" />
-      <Setter Property="Padding" Value="8,5" />
-      <Setter Property="Foreground" Value="#B7C6D8" />
+      <Setter Property="Width" Value="208" />
+      <Setter Property="Margin" Value="0,1" />
+      <Setter Property="Padding" Value="8,4" />
+      <Setter Property="Foreground" Value="#AFBCB9" />
       <Setter Property="FontSize" Value="14" />
       <Setter Property="FontWeight" Value="SemiBold" />
       <Setter Property="Cursor" Value="Hand" />
@@ -111,14 +111,14 @@
         <Setter.Value>
           <ControlTemplate TargetType="TabItem">
             <Border x:Name="TabBorder" Background="Transparent" BorderBrush="Transparent"
-                    BorderThickness="1" CornerRadius="7" Padding="{TemplateBinding Padding}">
+                    BorderThickness="1" CornerRadius="5" Padding="{TemplateBinding Padding}">
               <Grid>
                 <Grid.ColumnDefinitions>
                   <ColumnDefinition Width="3" />
                   <ColumnDefinition Width="Auto" />
                   <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Border x:Name="SelectionMark" Background="#6EA3FF" CornerRadius="2"
+                <Border x:Name="SelectionMark" Background="#71CABB" CornerRadius="2"
                         Margin="0,5" Visibility="Collapsed" />
                 <TextBlock x:Name="TabIcon" Grid.Column="1"
                            Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
@@ -130,17 +130,17 @@
             </Border>
             <ControlTemplate.Triggers>
               <Trigger Property="IsMouseOver" Value="True">
-                <Setter TargetName="TabBorder" Property="Background" Value="#1B2D42" />
-                <Setter Property="Foreground" Value="#F0F4F8" />
-                <Setter TargetName="TabIcon" Property="Foreground" Value="#8AB4FF" />
+                        <Setter TargetName="TabBorder" Property="Background" Value="#202B2F" />
+                <Setter Property="Foreground" Value="#EEF2EF" />
+                        <Setter TargetName="TabIcon" Property="Foreground" Value="#71CABB" />
               </Trigger>
               <Trigger Property="IsKeyboardFocused" Value="True">
-                <Setter TargetName="TabBorder" Property="BorderBrush" Value="#6EA3FF" />
+                <Setter TargetName="TabBorder" Property="BorderBrush" Value="#71CABB" />
               </Trigger>
               <Trigger Property="IsSelected" Value="True">
-                <Setter TargetName="TabBorder" Property="Background" Value="#1B3552" />
-                <Setter Property="Foreground" Value="#F0F4F8" />
-                <Setter TargetName="TabIcon" Property="Foreground" Value="#8AB4FF" />
+                <Setter TargetName="TabBorder" Property="Background" Value="#202C30" />
+                <Setter Property="Foreground" Value="#EEF2EF" />
+                <Setter TargetName="TabIcon" Property="Foreground" Value="#71CABB" />
                 <Setter TargetName="SelectionMark" Property="Visibility" Value="Visible" />
               </Trigger>
               <Trigger Property="IsEnabled" Value="False">
@@ -159,30 +159,29 @@
           <ControlTemplate TargetType="TabControl">
             <Grid KeyboardNavigation.TabNavigation="Local">
               <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="252" />
+                <ColumnDefinition Width="236" />
                 <ColumnDefinition Width="*" />
               </Grid.ColumnDefinitions>
-              <Border Grid.Column="0" Background="#142B49" BorderBrush="#223952" BorderThickness="1"
-                      CornerRadius="10" Margin="0,0,14,0" />
-              <Grid Grid.Column="0" Margin="10,16,26,14">
+              <Border Grid.Column="0" Background="#17282D" BorderBrush="#303C3E" BorderThickness="1"
+                      CornerRadius="5" Margin="0,0,14,0" />
+              <Grid Grid.Column="0" Margin="9,16,18,14">
                 <Grid.RowDefinitions>
                   <RowDefinition Height="Auto" />
                   <RowDefinition Height="Auto" />
                   <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="8,2,8,17">
-                  <Border Width="38" Height="38" Background="#1E3A5F" CornerRadius="8" Margin="0,0,10,0">
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="8,2,8,21">
+                  <Border Width="34" Height="34" Background="#243B3C" CornerRadius="5" Margin="0,0,10,0">
                     <TextBlock Text="&#xE7BF;" FontFamily="Segoe MDL2 Assets" FontSize="17"
                                Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
                   </Border>
                   <StackPanel VerticalAlignment="Center">
                     <TextBlock Text="SUPERMERCADO POS" FontSize="10" FontWeight="Bold" Foreground="#91A9C3" />
                     <TextBlock Text="Caja e inventario" FontSize="14" FontWeight="Bold"
-                               Foreground="#F0F4F8" Margin="0,2,0,0" />
+                               Foreground="#EEF2EF" Margin="0,2,0,0" />
                   </StackPanel>
                 </StackPanel>
-                <TextBlock Grid.Row="1" Text="MENÚ" FontSize="10" FontWeight="Bold"
-                           Foreground="#829AB4" Margin="11,0,0,7" />
+                <Border Grid.Row="1" Height="1" Background="#303C3E" Margin="8,0,8,10" />
                 <TabPanel Grid.Row="2" IsItemsHost="True" KeyboardNavigation.TabIndex="1"
                           VerticalAlignment="Top" />
               </Grid>
@@ -198,9 +197,9 @@
       <Setter Property="Padding" Value="10,8" />
       <Setter Property="FontSize" Value="14" />
       <Setter Property="Background" Value="{StaticResource InputBrush}" />
-      <Setter Property="Foreground" Value="#EDF3FA" />
-      <Setter Property="CaretBrush" Value="#8AB4FF" />
-      <Setter Property="BorderBrush" Value="#344960" />
+      <Setter Property="Foreground" Value="#E6ECE9" />
+      <Setter Property="CaretBrush" Value="#71CABB" />
+      <Setter Property="BorderBrush" Value="#354246" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
@@ -208,25 +207,25 @@
       <Setter Property="Padding" Value="10,8" />
       <Setter Property="FontSize" Value="14" />
       <Setter Property="Background" Value="{StaticResource InputBrush}" />
-      <Setter Property="Foreground" Value="#EDF3FA" />
-      <Setter Property="CaretBrush" Value="#8AB4FF" />
-      <Setter Property="BorderBrush" Value="#344960" />
+      <Setter Property="Foreground" Value="#E6ECE9" />
+      <Setter Property="CaretBrush" Value="#71CABB" />
+      <Setter Property="BorderBrush" Value="#354246" />
       <Setter Property="BorderThickness" Value="1" />
     </Style>
     <Style TargetType="ComboBox">
       <Setter Property="Padding" Value="8,6" />
       <Setter Property="FontSize" Value="14" />
       <Setter Property="Background" Value="{StaticResource InputBrush}" />
-      <Setter Property="Foreground" Value="#EDF3FA" />
-      <Setter Property="BorderBrush" Value="#344960" />
+      <Setter Property="Foreground" Value="#E6ECE9" />
+      <Setter Property="BorderBrush" Value="#354246" />
     </Style>
     <Style TargetType="ComboBoxItem">
-      <Setter Property="Background" Value="#152438" />
-      <Setter Property="Foreground" Value="#D6E0EB" />
+      <Setter Property="Background" Value="#1A252A" />
+      <Setter Property="Foreground" Value="#CBD5D2" />
       <Setter Property="Padding" Value="10,7" />
       <Style.Triggers>
         <Trigger Property="IsHighlighted" Value="True">
-          <Setter Property="Background" Value="#1C3452" />
+          <Setter Property="Background" Value="#263A3A" />
           <Setter Property="Foreground" Value="#FFFFFF" />
         </Trigger>
         <Trigger Property="IsSelected" Value="True">
@@ -237,66 +236,66 @@
     </Style>
     <Style TargetType="DatePicker">
       <Setter Property="Background" Value="{StaticResource InputBrush}" />
-      <Setter Property="Foreground" Value="#EDF3FA" />
-      <Setter Property="BorderBrush" Value="#344960" />
+      <Setter Property="Foreground" Value="#E6ECE9" />
+      <Setter Property="BorderBrush" Value="#354246" />
     </Style>
     <Style TargetType="ContextMenu">
-      <Setter Property="Background" Value="#152438" />
-      <Setter Property="Foreground" Value="#D6E0EB" />
-      <Setter Property="BorderBrush" Value="#344960" />
+      <Setter Property="Background" Value="#1A252A" />
+      <Setter Property="Foreground" Value="#CBD5D2" />
+      <Setter Property="BorderBrush" Value="#354246" />
     </Style>
     <Style TargetType="MenuItem">
-      <Setter Property="Background" Value="#152438" />
-      <Setter Property="Foreground" Value="#D6E0EB" />
+      <Setter Property="Background" Value="#1A252A" />
+      <Setter Property="Foreground" Value="#CBD5D2" />
       <Setter Property="Padding" Value="12,8" />
       <Style.Triggers>
         <Trigger Property="IsHighlighted" Value="True">
-          <Setter Property="Background" Value="#1C3452" />
+          <Setter Property="Background" Value="#263A3A" />
           <Setter Property="Foreground" Value="#FFFFFF" />
         </Trigger>
       </Style.Triggers>
     </Style>
     <Style TargetType="DataGrid">
-      <Setter Property="Background" Value="#152438" />
-      <Setter Property="BorderBrush" Value="#2B3D53" />
+      <Setter Property="Background" Value="#1A252A" />
+      <Setter Property="BorderBrush" Value="#303A3D" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="GridLinesVisibility" Value="Horizontal" />
-      <Setter Property="HorizontalGridLinesBrush" Value="#263B52" />
-      <Setter Property="VerticalGridLinesBrush" Value="#263B52" />
-      <Setter Property="RowBackground" Value="#152438" />
-      <Setter Property="AlternatingRowBackground" Value="#192A3E" />
+      <Setter Property="HorizontalGridLinesBrush" Value="#303A3D" />
+      <Setter Property="VerticalGridLinesBrush" Value="#303A3D" />
+      <Setter Property="RowBackground" Value="#1A252A" />
+      <Setter Property="AlternatingRowBackground" Value="#1F2B30" />
       <Setter Property="AlternationCount" Value="2" />
       <Setter Property="ColumnHeaderHeight" Value="44" />
       <Setter Property="RowHeaderWidth" Value="0" />
       <Setter Property="HeadersVisibility" Value="Column" />
     </Style>
     <Style TargetType="DataGridColumnHeader">
-      <Setter Property="Background" Value="#172B42" />
+      <Setter Property="Background" Value="#202B2F" />
       <Setter Property="Foreground" Value="#FFFFFF" />
       <Setter Property="FontWeight" Value="SemiBold" />
       <Setter Property="Padding" Value="13,10" />
-      <Setter Property="BorderBrush" Value="#2B4059" />
+      <Setter Property="BorderBrush" Value="#303C3E" />
       <Setter Property="BorderThickness" Value="0,0,1,0" />
       <Setter Property="HorizontalContentAlignment" Value="Left" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
       <Style.Triggers>
         <Trigger Property="IsMouseOver" Value="True">
-          <Setter Property="Background" Value="#203A58" />
+          <Setter Property="Background" Value="#2D3A3D" />
         </Trigger>
       </Style.Triggers>
     </Style>
     <Style TargetType="DataGridRow">
-      <Setter Property="Foreground" Value="#D6E0EB" />
+      <Setter Property="Foreground" Value="#CBD5D2" />
       <Setter Property="MinHeight" Value="42" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
-      <Setter Property="BorderBrush" Value="#263B52" />
+      <Setter Property="BorderBrush" Value="#303A3D" />
       <Setter Property="BorderThickness" Value="0,0,0,1" />
       <Style.Triggers>
         <Trigger Property="IsMouseOver" Value="True">
-          <Setter Property="Background" Value="#1D324A" />
+          <Setter Property="Background" Value="#28373A" />
         </Trigger>
         <Trigger Property="IsSelected" Value="True">
-          <Setter Property="Background" Value="#203F66" />
+          <Setter Property="Background" Value="#2F4142" />
           <Setter Property="Foreground" Value="#FFFFFF" />
         </Trigger>
       </Style.Triggers>
@@ -305,18 +304,18 @@
       <Setter Property="Padding" Value="10,7" />
       <Setter Property="BorderThickness" Value="0" />
       <Setter Property="Background" Value="Transparent" />
-      <Setter Property="Foreground" Value="#D6E0EB" />
+      <Setter Property="Foreground" Value="#CBD5D2" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
       <Style.Triggers>
         <Trigger Property="IsSelected" Value="True">
-          <Setter Property="Background" Value="#244A78" />
+          <Setter Property="Background" Value="#2B5150" />
           <Setter Property="Foreground" Value="#FFFFFF" />
         </Trigger>
       </Style.Triggers>
     </Style>
     <Style x:Key="FieldLabel" TargetType="TextBlock">
       <Setter Property="FontWeight" Value="SemiBold" />
-      <Setter Property="Foreground" Value="#D6E0EB" />
+      <Setter Property="Foreground" Value="#CBD5D2" />
       <Setter Property="Margin" Value="0,0,0,5" />
     </Style>
   </Application.Resources>
