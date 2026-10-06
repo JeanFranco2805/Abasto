@@ -4,7 +4,7 @@
         Title="Ingreso al punto de venta"
         Width="980" Height="660" MinWidth="920" MinHeight="620" ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
-        Background="#152438"
+        Background="#1A252A"
         FontFamily="Segoe UI" xml:lang="es-CO">
   <Grid>
     <Grid.ColumnDefinitions>
@@ -12,94 +12,7 @@
       <ColumnDefinition Width="1.04*" />
     </Grid.ColumnDefinitions>
 
-    <Border Padding="42,38" ClipToBounds="True">
-      <Border.Background>
-        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-          <GradientStop Color="#102B4C" Offset="0" />
-          <GradientStop Color="#174C78" Offset="1" />
-        </LinearGradientBrush>
-      </Border.Background>
-      <Grid>
-        <Ellipse Width="310" Height="310" Fill="#12FFFFFF" HorizontalAlignment="Right"
-                 VerticalAlignment="Top" Margin="0,-150,-150,0" />
-        <Ellipse Width="220" Height="220" Fill="#0FFFFFFF" HorizontalAlignment="Right"
-                 VerticalAlignment="Bottom" Margin="0,0,-105,-105" />
-        <Grid>
-          <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-          </Grid.RowDefinitions>
-
-          <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
-            <Border Width="46" Height="46" Background="#1CFFFFFF" CornerRadius="13" Margin="0,0,12,0">
-              <TextBlock Text="&#xE7BF;" FontFamily="Segoe MDL2 Assets" FontSize="22"
-                         Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
-            </Border>
-            <StackPanel VerticalAlignment="Center">
-              <TextBlock Text="SUPERMERCADO" FontSize="12" FontWeight="Bold" Foreground="#C9D9EA" />
-              <TextBlock Text="Punto de venta" FontSize="15" FontWeight="SemiBold" Foreground="White" Margin="0,2,0,0" />
-            </StackPanel>
-          </StackPanel>
-
-          <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,8,0,20">
-            <Border Background="#18FFFFFF" CornerRadius="12" Padding="11,7" HorizontalAlignment="Left" Margin="0,0,0,20">
-              <TextBlock Text="HECHO PARA EL DÍA A DÍA" FontSize="10" FontWeight="Bold"
-                         Foreground="#E5F0FF" />
-            </Border>
-            <TextBlock Text="Tu tienda en marcha" FontSize="34" FontWeight="Bold"
-                       Foreground="White" TextWrapping="NoWrap" />
-            <TextBlock Text="Atiende más rápido y mantén el control de cada movimiento desde una sola caja."
-                       FontSize="15" Foreground="#D2E2F1" TextWrapping="Wrap" LineHeight="23"
-                       Margin="0,14,0,24" />
-
-            <StackPanel>
-              <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
-                <Border Width="34" Height="34" Background="#18FFFFFF" CornerRadius="10" Margin="0,0,12,0">
-                  <TextBlock Text="&#xE719;" FontFamily="Segoe MDL2 Assets" FontSize="15" Foreground="White"
-                             HorizontalAlignment="Center" VerticalAlignment="Center" />
-                </Border>
-                <StackPanel VerticalAlignment="Center">
-                  <TextBlock Text="Ventas ágiles" FontSize="13" FontWeight="SemiBold" Foreground="White" />
-                  <TextBlock Text="Busca, escanea y cobra" FontSize="11" Foreground="#C9D9EA" Margin="0,2,0,0" />
-                </StackPanel>
-              </StackPanel>
-              <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
-                <Border Width="34" Height="34" Background="#18FFFFFF" CornerRadius="10" Margin="0,0,12,0">
-                  <TextBlock Text="&#xE7B8;" FontFamily="Segoe MDL2 Assets" FontSize="15" Foreground="White"
-                             HorizontalAlignment="Center" VerticalAlignment="Center" />
-                </Border>
-                <StackPanel VerticalAlignment="Center">
-                  <TextBlock Text="Inventario al día" FontSize="13" FontWeight="SemiBold" Foreground="White" />
-                  <TextBlock Text="Productos y existencias en un solo lugar" FontSize="11" Foreground="#C9D9EA" Margin="0,2,0,0" />
-                </StackPanel>
-              </StackPanel>
-              <StackPanel Orientation="Horizontal">
-                <Border Width="34" Height="34" Background="#18FFFFFF" CornerRadius="10" Margin="0,0,12,0">
-                  <TextBlock Text="&#xE9D2;" FontFamily="Segoe MDL2 Assets" FontSize="15" Foreground="White"
-                             HorizontalAlignment="Center" VerticalAlignment="Center" />
-                </Border>
-                <StackPanel VerticalAlignment="Center">
-                  <TextBlock Text="Caja bajo control" FontSize="13" FontWeight="SemiBold" Foreground="White" />
-                  <TextBlock Text="Turnos, arqueos y reportes" FontSize="11" Foreground="#C9D9EA" Margin="0,2,0,0" />
-                </StackPanel>
-              </StackPanel>
-            </StackPanel>
-          </StackPanel>
-
-          <Border Grid.Row="2" Background="#14FFFFFF" CornerRadius="12" Padding="13,11">
-            <StackPanel Orientation="Horizontal">
-              <Ellipse Width="8" Height="8" Fill="#32D583" VerticalAlignment="Center" Margin="0,0,9,0" />
-              <TextBlock Text="Operación local disponible" FontSize="12" FontWeight="SemiBold" Foreground="White" />
-              <TextBlock Text=" · " FontSize="12" Foreground="#C9D9EA" />
-              <TextBlock Text="No requiere internet para vender" FontSize="12" Foreground="#D2E2F1" />
-            </StackPanel>
-          </Border>
-        </Grid>
-      </Grid>
-    </Border>
-
-    <Border Grid.Column="1" Background="#152438" Padding="54,42">
+    <Border Padding="44,42" Background="#17282D">
       <Grid>
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -107,41 +20,86 @@
           <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Border Background="#172A40" CornerRadius="14" Padding="11,8" HorizontalAlignment="Left">
-          <StackPanel Orientation="Horizontal">
-            <Ellipse Width="7" Height="7" Fill="#155EEF" VerticalAlignment="Center" Margin="0,0,8,0" />
-            <TextBlock Text="ACCESO DE CAJA" FontSize="10" FontWeight="Bold" Foreground="#C3CFDC" />
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top">
+          <TextBlock Text="&#xE7BF;" FontFamily="Segoe MDL2 Assets" FontSize="21"
+                     Foreground="#71CABB" VerticalAlignment="Center" Margin="0,0,12,0" />
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="SUPERMERCADO" FontSize="11" FontWeight="Bold" Foreground="#A1AEAB" />
+            <TextBlock Text="Punto de venta" FontSize="14" FontWeight="SemiBold" Foreground="#EEF2EF" Margin="0,2,0,0" />
           </StackPanel>
-        </Border>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,0,0,18">
+          <TextBlock Text="Tu tienda, en orden." FontSize="30" FontWeight="SemiBold"
+                     Foreground="#EEF2EF" TextWrapping="Wrap" />
+          <TextBlock Text="Ventas, inventario y turnos de caja en un mismo lugar."
+                     FontSize="14" Foreground="#A1AEAB" TextWrapping="Wrap" Margin="0,10,0,28" />
+
+          <StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+              <Border Width="2" Height="28" Background="#36A995" Margin="0,0,13,0" />
+              <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="Venta" FontSize="13" FontWeight="SemiBold" Foreground="#EEF2EF" />
+                <TextBlock Text="Busca, escanea y cobra" FontSize="11" Foreground="#A1AEAB" Margin="0,2,0,0" />
+              </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,16">
+              <Border Width="2" Height="28" Background="#36A995" Margin="0,0,13,0" />
+              <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="Inventario" FontSize="13" FontWeight="SemiBold" Foreground="#EEF2EF" />
+                <TextBlock Text="Productos y existencias" FontSize="11" Foreground="#A1AEAB" Margin="0,2,0,0" />
+              </StackPanel>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+              <Border Width="2" Height="28" Background="#36A995" Margin="0,0,13,0" />
+              <StackPanel VerticalAlignment="Center">
+                <TextBlock Text="Caja" FontSize="13" FontWeight="SemiBold" Foreground="#EEF2EF" />
+                <TextBlock Text="Turnos y reportes" FontSize="11" Foreground="#A1AEAB" Margin="0,2,0,0" />
+              </StackPanel>
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal">
+          <Ellipse Width="7" Height="7" Fill="#36A995" VerticalAlignment="Center" Margin="0,0,9,0" />
+          <TextBlock Text="Disponible sin internet" FontSize="12" Foreground="#A1AEAB" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <Border Grid.Column="1" Background="#1A252A" Padding="54,42">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="ACCESO DE CAJA" FontSize="10" FontWeight="Bold" Foreground="#71CABB" />
 
         <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,16,0,20">
-          <TextBlock Text="Iniciar sesión" FontSize="30" FontWeight="Bold" Foreground="#F0F4F8" />
+          <TextBlock Text="Iniciar sesión" FontSize="29" FontWeight="SemiBold" Foreground="#EEF2EF" />
           <TextBlock Text="Ingresa tu usuario y PIN para continuar."
-                     FontSize="14" Foreground="#A8B5C5" TextWrapping="NoWrap" Margin="0,7,0,27" />
+                     FontSize="14" Foreground="#A1AEAB" TextWrapping="Wrap" Margin="0,7,0,27" />
 
-          <TextBlock Text="Usuario" FontSize="13" FontWeight="SemiBold" Foreground="#D6E0EB" Margin="0,0,0,7" />
-          <TextBox x:Name="UsernameBox" Text="cajero" FontSize="15" Padding="14,12"
-                   BorderBrush="#344960" Margin="0,0,0,18" />
+          <TextBlock Text="Usuario" FontSize="13" FontWeight="SemiBold" Foreground="#CBD5D2" Margin="0,0,0,7" />
+          <TextBox x:Name="UsernameBox" Text="cajero" FontSize="15" Padding="13,11"
+                   BorderBrush="#354246" Margin="0,0,0,18" />
 
-          <Grid Margin="0,0,0,7">
-            <TextBlock Text="PIN" FontSize="13" FontWeight="SemiBold" Foreground="#D6E0EB" />
-            <TextBlock Text="De 4 a 12 caracteres" FontSize="11" Foreground="#93A3B7"
-                       HorizontalAlignment="Right" />
-          </Grid>
-          <PasswordBox x:Name="PinBox" Padding="14,12" FontSize="16" MaxLength="12" Password="1111"
-                       BorderBrush="#344960" />
+          <TextBlock Text="PIN" FontSize="13" FontWeight="SemiBold" Foreground="#CBD5D2" Margin="0,0,0,7" />
+          <PasswordBox x:Name="PinBox" Padding="13,11" FontSize="16" MaxLength="12" Password="1111"
+                       BorderBrush="#354246" />
 
           <TextBlock x:Name="ErrorText" Foreground="#FFB4AB" TextWrapping="Wrap" Margin="0,9,0,0"
                      MinHeight="18" FontSize="12" />
-          <Button Content="Entrar al punto de venta  →" Click="Login_Click" IsDefault="True"
-                  Background="#155EEF" Foreground="White" BorderBrush="#155EEF" Height="52"
-                  FontSize="15" Margin="0,12,0,0" />
+          <Button Content="Entrar al punto de venta" Click="Login_Click" IsDefault="True"
+                  Background="#36A995" Foreground="#071A18" BorderBrush="#36A995" Height="48"
+                  FontSize="14" Margin="0,12,0,0" />
         </StackPanel>
 
-        <Border Grid.Row="2" Background="#192B40" BorderBrush="#2B3D53" BorderThickness="1"
-                CornerRadius="12" Padding="14,12">
+        <Border Grid.Row="2" BorderBrush="#303A3D" BorderThickness="0,1,0,0" Padding="0,14,0,0">
           <StackPanel>
-            <TextBlock Text="CUENTAS DE DEMOSTRACIÓN" FontSize="10" FontWeight="Bold" Foreground="#A8B5C5"
+            <TextBlock Text="CUENTAS DE DEMOSTRACIÓN" FontSize="10" FontWeight="Bold" Foreground="#A1AEAB"
                        Margin="0,0,0,9" />
             <Grid>
               <Grid.ColumnDefinitions>
@@ -150,16 +108,16 @@
                 <ColumnDefinition Width="*" />
               </Grid.ColumnDefinitions>
               <StackPanel>
-                <TextBlock Text="CAJERO" FontSize="10" FontWeight="SemiBold" Foreground="#93A3B7" />
-                <TextBlock Text="cajero · 1111" FontSize="12" FontWeight="SemiBold" Foreground="#D6E0EB" Margin="0,3,0,0" />
+                <TextBlock Text="CAJERO" FontSize="9" FontWeight="SemiBold" Foreground="#909E9B" />
+                <TextBlock Text="cajero · 1111" FontSize="11" FontWeight="SemiBold" Foreground="#CBD5D2" Margin="0,3,0,0" />
               </StackPanel>
               <StackPanel Grid.Column="1">
-                <TextBlock Text="SUPERVISOR" FontSize="10" FontWeight="SemiBold" Foreground="#93A3B7" />
-                <TextBlock Text="supervisor · 1234" FontSize="12" FontWeight="SemiBold" Foreground="#D6E0EB" Margin="0,3,0,0" />
+                <TextBlock Text="SUPERVISOR" FontSize="9" FontWeight="SemiBold" Foreground="#909E9B" />
+                <TextBlock Text="supervisor · 1234" FontSize="11" FontWeight="SemiBold" Foreground="#CBD5D2" Margin="0,3,0,0" />
               </StackPanel>
               <StackPanel Grid.Column="2">
-                <TextBlock Text="ADMIN" FontSize="10" FontWeight="SemiBold" Foreground="#93A3B7" />
-                <TextBlock Text="admin · 2468" FontSize="12" FontWeight="SemiBold" Foreground="#D6E0EB" Margin="0,3,0,0" />
+                <TextBlock Text="ADMIN" FontSize="9" FontWeight="SemiBold" Foreground="#909E9B" />
+                <TextBlock Text="admin · 2468" FontSize="11" FontWeight="SemiBold" Foreground="#CBD5D2" Margin="0,3,0,0" />
               </StackPanel>
             </Grid>
           </StackPanel>
