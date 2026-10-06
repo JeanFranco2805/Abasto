@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using SupermercadoPOS.Dialogs;
 using SupermercadoPOS.Domain;
 using SupermercadoPOS.Services;
@@ -12,11 +13,15 @@ namespace SupermercadoPOS;
 public partial class MainWindow : Window
 {
     private readonly List<Product> _allProducts = [];
+    private List<Product> _filteredInventoryProducts = [];
+    private int _inventoryCurrentPage = 1;
+    private bool _suppressInventoryFilterEvents;
     private CashShift? _openShift;
     private long? _currentSuspendedSaleId;
 
     public ObservableCollection<Product> DisplayProducts { get; } = [];
-    public ObservableCollection<Product> InventoryProducts { get; } = [];
+    public ObservableCollection<InventoryProductCard> InventoryProducts { get; } = [];
+    public ObservableCollection<string> InventoryCategories { get; } = ["Todas las categorías"];
     public ObservableCollection<CartLineViewModel> Cart { get; } = [];
     public MainWindow()
     {
@@ -45,7 +50,8 @@ public partial class MainWindow : Window
         _allProducts.Clear();
         _allProducts.AddRange(products);
         ApplyProductFilters();
-        RefreshInventorySummary();
+        RefreshInventoryCategories();
+        ApplyInventoryFilter();
     }
 
     private void ApplyProductFilters()
@@ -360,23 +366,143 @@ public partial class MainWindow : Window
 
     private void InventorySearch_TextChanged(object sender, TextChangedEventArgs e)
     {
-        if (InventoryGrid is not null && InventorySearchBox is not null)
+        if (IsLoaded && !_suppressInventoryFilterEvents && InventorySearchBox is not null)
             ApplyInventoryFilter();
+    }
+
+    private void InventoryFilters_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (IsLoaded && !_suppressInventoryFilterEvents)
+            ApplyInventoryFilter();
+    }
+
+    private void InventoryPageSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (IsLoaded && !_suppressInventoryFilterEvents)
+            ApplyInventoryFilter();
+    }
+
+    private void RefreshInventoryCategories()
+    {
+        _suppressInventoryFilterEvents = true;
+        var selectedCategory = InventoryCategoryFilterBox.SelectedItem as string;
+        InventoryCategories.Clear();
+        InventoryCategories.Add("Todas las categorías");
+        foreach (var category in _allProducts
+                     .Select(product => product.Category.Trim())
+                     .Where(category => category.Length > 0)
+                     .Distinct(StringComparer.CurrentCultureIgnoreCase)
+                     .OrderBy(category => category, StringComparer.CurrentCultureIgnoreCase))
+        {
+            InventoryCategories.Add(category);
+        }
+
+        InventoryCategoryFilterBox.SelectedItem = selectedCategory is not null
+            && InventoryCategories.Contains(selectedCategory)
+            ? selectedCategory
+            : InventoryCategories[0];
+        _suppressInventoryFilterEvents = false;
     }
 
     private void ApplyInventoryFilter()
     {
         var term = InventorySearchBox.Text.Trim();
-        var products = string.IsNullOrWhiteSpace(term)
-            ? _allProducts
-            : _allProducts.Where(p => p.Name.Contains(term, StringComparison.CurrentCultureIgnoreCase)
-                || p.Barcode.Contains(term, StringComparison.OrdinalIgnoreCase)
-                || p.Category.Contains(term, StringComparison.CurrentCultureIgnoreCase)).ToList();
-        InventoryProducts.Clear();
-        foreach (var product in products)
-            InventoryProducts.Add(product);
-        InventoryGrid.ItemsSource = InventoryProducts;
+        var selectedCategory = InventoryCategoryFilterBox.SelectedItem as string;
+        var stockFilter = (InventoryStockFilterBox.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "all";
+        var sortMode = (InventorySortBox.SelectedItem as ComboBoxItem)?.Tag?.ToString() ?? "name";
+
+        IEnumerable<Product> products = _allProducts;
+        if (!string.IsNullOrWhiteSpace(term))
+        {
+            products = products.Where(product => product.Name.Contains(term, StringComparison.CurrentCultureIgnoreCase)
+                || product.Barcode.Contains(term, StringComparison.OrdinalIgnoreCase)
+                || product.Category.Contains(term, StringComparison.CurrentCultureIgnoreCase));
+        }
+
+        if (!string.IsNullOrWhiteSpace(selectedCategory) && selectedCategory != "Todas las categorías")
+            products = products.Where(product => product.Category.Equals(selectedCategory, StringComparison.CurrentCultureIgnoreCase));
+
+        products = stockFilter switch
+        {
+            "low" => products.Where(product => product.Stock > 0 && product.Stock <= product.MinimumStock),
+            "empty" => products.Where(product => product.Stock <= 0),
+            "available" => products.Where(product => product.Stock > product.MinimumStock),
+            _ => products
+        };
+
+        products = sortMode switch
+        {
+            "price-asc" => products.OrderBy(product => product.UnitPrice).ThenBy(product => product.Name),
+            "price-desc" => products.OrderByDescending(product => product.UnitPrice).ThenBy(product => product.Name),
+            "stock-asc" => products.OrderBy(product => product.Stock).ThenBy(product => product.Name),
+            _ => products.OrderBy(product => product.Name, StringComparer.CurrentCultureIgnoreCase)
+        };
+
+        _filteredInventoryProducts = products.ToList();
+        _inventoryCurrentPage = 1;
+        RenderInventoryPage();
         RefreshInventorySummary();
+    }
+
+    private void RenderInventoryPage()
+    {
+        var pageSize = int.TryParse((InventoryPageSizeBox.SelectedItem as ComboBoxItem)?.Tag?.ToString(), out var size)
+            ? size
+            : 8;
+        var pageCount = Math.Max(1, (int)Math.Ceiling(_filteredInventoryProducts.Count / (double)pageSize));
+        _inventoryCurrentPage = Math.Clamp(_inventoryCurrentPage, 1, pageCount);
+
+        InventoryProducts.Clear();
+        foreach (var product in _filteredInventoryProducts.Skip((_inventoryCurrentPage - 1) * pageSize).Take(pageSize))
+            InventoryProducts.Add(new InventoryProductCard(product));
+
+        InventoryCardsList.SelectedItem = null;
+        EditInventoryButton.IsEnabled = false;
+        InventoryEmptyStatePanel.Visibility = InventoryProducts.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        var first = _filteredInventoryProducts.Count == 0 ? 0 : ((_inventoryCurrentPage - 1) * pageSize) + 1;
+        var last = Math.Min(_inventoryCurrentPage * pageSize, _filteredInventoryProducts.Count);
+        InventoryRangeText.Text = _filteredInventoryProducts.Count == 0
+            ? "0 productos encontrados"
+            : $"Mostrando {first:N0}–{last:N0} de {_filteredInventoryProducts.Count:N0} productos";
+        InventoryPageText.Text = $"Página {_inventoryCurrentPage} de {pageCount}";
+        InventoryPreviousPageButton.IsEnabled = _inventoryCurrentPage > 1;
+        InventoryNextPageButton.IsEnabled = _inventoryCurrentPage < pageCount;
+    }
+
+    private void InventoryCardsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        EditInventoryButton.IsEnabled = InventoryCardsList.SelectedItem is InventoryProductCard;
+    }
+
+    private void InventoryPreviousPage_Click(object sender, RoutedEventArgs e)
+    {
+        if (_inventoryCurrentPage <= 1)
+            return;
+        _inventoryCurrentPage--;
+        RenderInventoryPage();
+    }
+
+    private void InventoryNextPage_Click(object sender, RoutedEventArgs e)
+    {
+        var pageSize = int.TryParse((InventoryPageSizeBox.SelectedItem as ComboBoxItem)?.Tag?.ToString(), out var size)
+            ? size
+            : 8;
+        var pageCount = Math.Max(1, (int)Math.Ceiling(_filteredInventoryProducts.Count / (double)pageSize));
+        if (_inventoryCurrentPage >= pageCount)
+            return;
+        _inventoryCurrentPage++;
+        RenderInventoryPage();
+    }
+
+    private void ClearInventoryFilters_Click(object sender, RoutedEventArgs e)
+    {
+        _suppressInventoryFilterEvents = true;
+        InventorySearchBox.Clear();
+        InventoryCategoryFilterBox.SelectedIndex = 0;
+        InventoryStockFilterBox.SelectedIndex = 0;
+        InventorySortBox.SelectedIndex = 0;
+        _suppressInventoryFilterEvents = false;
+        ApplyInventoryFilter();
     }
 
     private void RefreshInventorySummary()
@@ -397,10 +523,10 @@ public partial class MainWindow : Window
 
     private async void EditProduct_Click(object sender, RoutedEventArgs e)
     {
-        var selected = InventoryGrid.SelectedItem as Product;
+        var selected = (InventoryCardsList.SelectedItem as InventoryProductCard)?.Product;
         if (selected is null)
         {
-            MessageBox.Show("Selecciona un producto de la tabla.", "Inventario", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show("Selecciona una tarjeta de producto para editarla.", "Inventario", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
         var dialog = new ProductDialog(selected) { Owner = this };
@@ -415,7 +541,6 @@ public partial class MainWindow : Window
         {
             await PosService.SaveProductAsync(product);
             await ReloadProductsAsync();
-            ApplyInventoryFilter();
         }
         catch (Exception ex)
         {
@@ -428,10 +553,7 @@ public partial class MainWindow : Window
         if (e.Source != MainTabs || !IsLoaded)
             return;
         if (ReferenceEquals(MainTabs.SelectedItem, InventoryTab))
-        {
             await ReloadProductsAsync();
-            ApplyInventoryFilter();
-        }
         else if (ReferenceEquals(MainTabs.SelectedItem, ShiftTab))
             await RefreshShiftPageAsync();
         else if (ReferenceEquals(MainTabs.SelectedItem, ReportsTab))
@@ -665,5 +787,34 @@ public partial class MainWindow : Window
         {
             MessageBox.Show(ex.Message, "No se pudo anular la venta", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
+    }
+}
+
+public sealed class InventoryProductCard(Product product)
+{
+    private static readonly Brush EmptyBackground = CreateBrush(0xFE, 0xF3, 0xF2);
+    private static readonly Brush EmptyForeground = CreateBrush(0xB4, 0x23, 0x18);
+    private static readonly Brush LowBackground = CreateBrush(0xFF, 0xFA, 0xEB);
+    private static readonly Brush LowForeground = CreateBrush(0xB5, 0x47, 0x08);
+    private static readonly Brush AvailableBackground = CreateBrush(0xEC, 0xFD, 0xF3);
+    private static readonly Brush AvailableForeground = CreateBrush(0x02, 0x7A, 0x48);
+
+    public Product Product { get; } = product;
+    public string Name => Product.Name;
+    public string Barcode => Product.Barcode;
+    public string Category => string.IsNullOrWhiteSpace(Product.Category) ? "Sin categoría" : Product.Category;
+    public string Unit => Product.Unit;
+    public decimal UnitPrice => Product.UnitPrice;
+    public decimal Stock => Product.Stock;
+    public decimal MinimumStock => Product.MinimumStock;
+    public string StockStatus => Stock <= 0 ? "Agotado" : Stock <= MinimumStock ? "Reponer" : "Disponible";
+    public Brush StockStatusBackground => Stock <= 0 ? EmptyBackground : Stock <= MinimumStock ? LowBackground : AvailableBackground;
+    public Brush StockStatusForeground => Stock <= 0 ? EmptyForeground : Stock <= MinimumStock ? LowForeground : AvailableForeground;
+
+    private static SolidColorBrush CreateBrush(byte red, byte green, byte blue)
+    {
+        var brush = new SolidColorBrush(Color.FromRgb(red, green, blue));
+        brush.Freeze();
+        return brush;
     }
 }
