@@ -4,7 +4,7 @@
         Title="Ingreso al punto de venta"
         Width="980" Height="660" MinWidth="920" MinHeight="620" ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
-        Background="#FFFFFF"
+        Background="#152438"
         FontFamily="Segoe UI" xml:lang="es-CO">
   <Grid>
     <Grid.ColumnDefinitions>
@@ -99,7 +99,7 @@
       </Grid>
     </Border>
 
-    <Border Grid.Column="1" Background="White" Padding="54,42">
+    <Border Grid.Column="1" Background="#152438" Padding="54,42">
       <Grid>
         <Grid.RowDefinitions>
           <RowDefinition Height="Auto" />
@@ -107,41 +107,41 @@
           <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Border Background="#F2F4F7" CornerRadius="14" Padding="11,8" HorizontalAlignment="Left">
+        <Border Background="#172A40" CornerRadius="14" Padding="11,8" HorizontalAlignment="Left">
           <StackPanel Orientation="Horizontal">
             <Ellipse Width="7" Height="7" Fill="#155EEF" VerticalAlignment="Center" Margin="0,0,8,0" />
-            <TextBlock Text="ACCESO DE CAJA" FontSize="10" FontWeight="Bold" Foreground="#475467" />
+            <TextBlock Text="ACCESO DE CAJA" FontSize="10" FontWeight="Bold" Foreground="#C3CFDC" />
           </StackPanel>
         </Border>
 
         <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,16,0,20">
-          <TextBlock Text="Iniciar sesión" FontSize="30" FontWeight="Bold" Foreground="#172B4D" />
+          <TextBlock Text="Iniciar sesión" FontSize="30" FontWeight="Bold" Foreground="#F0F4F8" />
           <TextBlock Text="Ingresa tu usuario y PIN para continuar."
-                     FontSize="14" Foreground="#667085" TextWrapping="NoWrap" Margin="0,7,0,27" />
+                     FontSize="14" Foreground="#A8B5C5" TextWrapping="NoWrap" Margin="0,7,0,27" />
 
-          <TextBlock Text="Usuario" FontSize="13" FontWeight="SemiBold" Foreground="#344054" Margin="0,0,0,7" />
+          <TextBlock Text="Usuario" FontSize="13" FontWeight="SemiBold" Foreground="#D6E0EB" Margin="0,0,0,7" />
           <TextBox x:Name="UsernameBox" Text="cajero" FontSize="15" Padding="14,12"
-                   BorderBrush="#D0D5DD" Margin="0,0,0,18" />
+                   BorderBrush="#344960" Margin="0,0,0,18" />
 
           <Grid Margin="0,0,0,7">
-            <TextBlock Text="PIN" FontSize="13" FontWeight="SemiBold" Foreground="#344054" />
-            <TextBlock Text="De 4 a 12 caracteres" FontSize="11" Foreground="#98A2B3"
+            <TextBlock Text="PIN" FontSize="13" FontWeight="SemiBold" Foreground="#D6E0EB" />
+            <TextBlock Text="De 4 a 12 caracteres" FontSize="11" Foreground="#93A3B7"
                        HorizontalAlignment="Right" />
           </Grid>
           <PasswordBox x:Name="PinBox" Padding="14,12" FontSize="16" MaxLength="12" Password="1111"
-                       BorderBrush="#D0D5DD" />
+                       BorderBrush="#344960" />
 
-          <TextBlock x:Name="ErrorText" Foreground="#B42318" TextWrapping="Wrap" Margin="0,9,0,0"
+          <TextBlock x:Name="ErrorText" Foreground="#FFB4AB" TextWrapping="Wrap" Margin="0,9,0,0"
                      MinHeight="18" FontSize="12" />
           <Button Content="Entrar al punto de venta  →" Click="Login_Click" IsDefault="True"
                   Background="#155EEF" Foreground="White" BorderBrush="#155EEF" Height="52"
                   FontSize="15" Margin="0,12,0,0" />
         </StackPanel>
 
-        <Border Grid.Row="2" Background="#F8FAFC" BorderBrush="#EAECF0" BorderThickness="1"
+        <Border Grid.Row="2" Background="#192B40" BorderBrush="#2B3D53" BorderThickness="1"
                 CornerRadius="12" Padding="14,12">
           <StackPanel>
-            <TextBlock Text="CUENTAS DE DEMOSTRACIÓN" FontSize="10" FontWeight="Bold" Foreground="#667085"
+            <TextBlock Text="CUENTAS DE DEMOSTRACIÓN" FontSize="10" FontWeight="Bold" Foreground="#A8B5C5"
                        Margin="0,0,0,9" />
             <Grid>
               <Grid.ColumnDefinitions>
@@ -150,16 +150,16 @@
                 <ColumnDefinition Width="*" />
               </Grid.ColumnDefinitions>
               <StackPanel>
-                <TextBlock Text="CAJERO" FontSize="10" FontWeight="SemiBold" Foreground="#98A2B3" />
-                <TextBlock Text="cajero · 1111" FontSize="12" FontWeight="SemiBold" Foreground="#344054" Margin="0,3,0,0" />
+                <TextBlock Text="CAJERO" FontSize="10" FontWeight="SemiBold" Foreground="#93A3B7" />
+                <TextBlock Text="cajero · 1111" FontSize="12" FontWeight="SemiBold" Foreground="#D6E0EB" Margin="0,3,0,0" />
               </StackPanel>
               <StackPanel Grid.Column="1">
-                <TextBlock Text="SUPERVISOR" FontSize="10" FontWeight="SemiBold" Foreground="#98A2B3" />
-                <TextBlock Text="supervisor · 1234" FontSize="12" FontWeight="SemiBold" Foreground="#344054" Margin="0,3,0,0" />
+                <TextBlock Text="SUPERVISOR" FontSize="10" FontWeight="SemiBold" Foreground="#93A3B7" />
+                <TextBlock Text="supervisor · 1234" FontSize="12" FontWeight="SemiBold" Foreground="#D6E0EB" Margin="0,3,0,0" />
               </StackPanel>
               <StackPanel Grid.Column="2">
-                <TextBlock Text="ADMIN" FontSize="10" FontWeight="SemiBold" Foreground="#98A2B3" />
-                <TextBlock Text="admin · 2468" FontSize="12" FontWeight="SemiBold" Foreground="#344054" Margin="0,3,0,0" />
+                <TextBlock Text="ADMIN" FontSize="10" FontWeight="SemiBold" Foreground="#93A3B7" />
+                <TextBlock Text="admin · 2468" FontSize="12" FontWeight="SemiBold" Foreground="#D6E0EB" Margin="0,3,0,0" />
               </StackPanel>
             </Grid>
           </StackPanel>
