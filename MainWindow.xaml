@@ -45,9 +45,10 @@
     </Border>
 
     <TabControl x:Name="MainTabs" Grid.Row="1" Margin="18" TabStripPlacement="Left"
+                Style="{StaticResource SidebarTabControlStyle}"
                 HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
                 SelectionChanged="MainTabs_SelectionChanged">
-      <TabItem x:Name="SalesTab" Header="Punto de venta" Tag="&#xE7BF;">
+      <TabItem x:Name="SalesTab" Header="Punto de venta" Tag="&#xE7BF;" Style="{StaticResource SidebarTabItemStyle}">
         <Grid Margin="12">
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1.55*" />
@@ -279,7 +280,7 @@
         </Grid>
       </TabItem>
 
-      <TabItem x:Name="ShiftTab" Header="Turnos y caja" Tag="&#xE8D7;">
+      <TabItem x:Name="ShiftTab" Header="Turnos y caja" Tag="&#xE8D7;" Style="{StaticResource SidebarTabItemStyle}">
         <Grid Margin="12">
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -370,7 +371,7 @@
         </Grid>
       </TabItem>
 
-      <TabItem x:Name="InventoryTab" Header="Inventario" Tag="&#xE7B8;">
+      <TabItem x:Name="InventoryTab" Header="Inventario" Tag="&#xE7B8;" Style="{StaticResource SidebarTabItemStyle}">
         <Grid Margin="12">
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -632,7 +633,7 @@
         </Grid>
       </TabItem>
 
-      <TabItem x:Name="ReportsTab" Header="Reportes" Tag="&#xE9D2;">
+      <TabItem x:Name="ReportsTab" Header="Reportes" Tag="&#xE9D2;" Style="{StaticResource SidebarTabItemStyle}">
         <Grid Margin="12">
           <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
           <Grid Margin="0,0,0,14">
@@ -745,7 +746,7 @@
         </Grid>
       </TabItem>
 
-      <TabItem x:Name="AuditTab" Header="Auditoría" Tag="&#xE8D4;">
+      <TabItem x:Name="AuditTab" Header="Auditoría" Tag="&#xE8D4;" Style="{StaticResource SidebarTabItemStyle}">
         <Grid Margin="12">
           <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
           <Grid Margin="0,0,0,14">
@@ -770,7 +771,7 @@
         </Grid>
       </TabItem>
 
-      <TabItem x:Name="SyncTab" Header="Conectividad" Tag="&#xE703;">
+      <TabItem x:Name="SyncTab" Header="Conectividad" Tag="&#xE703;" Style="{StaticResource SidebarTabItemStyle}">
         <Grid Margin="12">
           <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
           <Grid Margin="0,0,0,14">
@@ -816,7 +817,7 @@
         </Grid>
       </TabItem>
 
-      <TabItem x:Name="UsersTab" Header="Usuarios" Tag="&#xE77B;">
+      <TabItem x:Name="UsersTab" Header="Usuarios" Tag="&#xE77B;" Style="{StaticResource SidebarTabItemStyle}">
         <Grid Margin="12">
           <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
           <Grid Margin="0,0,0,14">
