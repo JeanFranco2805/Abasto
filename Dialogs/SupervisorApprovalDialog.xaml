@@ -4,21 +4,21 @@
         Title="Autorización de supervisor"
         Width="470" Height="390" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-        Background="#F3F5F8"
+        Background="#0D1724"
         FontFamily="Segoe UI">
   <Grid Margin="22">
     <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
     <StackPanel Margin="0,0,0,14">
-      <TextBlock Text="Autorización requerida" FontSize="23" FontWeight="Bold" Foreground="#172B4D" />
-      <TextBlock x:Name="MessageText" Foreground="#667085" TextWrapping="Wrap" Margin="0,4,0,0" />
+      <TextBlock Text="Autorización requerida" FontSize="23" FontWeight="Bold" Foreground="#F0F4F8" />
+      <TextBlock x:Name="MessageText" Foreground="#A8B5C5" TextWrapping="Wrap" Margin="0,4,0,0" />
     </StackPanel>
-    <Border Grid.Row="1" Background="White" CornerRadius="12" Padding="18">
+    <Border Grid.Row="1" Background="#152438" CornerRadius="12" Padding="18">
       <StackPanel>
         <TextBlock Text="Usuario supervisor" Style="{StaticResource FieldLabel}" />
         <TextBox x:Name="UsernameBox" Text="supervisor" Margin="0,0,0,12" />
         <TextBlock Text="PIN" Style="{StaticResource FieldLabel}" />
         <PasswordBox x:Name="PinBox" Padding="10,8" FontSize="14" />
-        <TextBlock x:Name="ErrorText" Foreground="#B42318" TextWrapping="Wrap" Margin="0,10,0,0" />
+        <TextBlock x:Name="ErrorText" Foreground="#FFB4AB" TextWrapping="Wrap" Margin="0,10,0,0" />
       </StackPanel>
     </Border>
     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
