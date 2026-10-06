@@ -19,9 +19,15 @@
           <ColumnDefinition Width="Auto" />
           <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <StackPanel VerticalAlignment="Center">
-          <TextBlock Text="SUPERMERCADO POS" Foreground="White" FontSize="17" FontWeight="Bold" />
-          <TextBlock Text="Punto de venta local" Foreground="#B7C6D8" FontSize="12" Margin="0,2,0,0" />
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+          <Border Width="40" Height="40" Background="#1CFFFFFF" CornerRadius="12" Margin="0,0,12,0">
+            <TextBlock Text="&#xE7BF;" FontFamily="Segoe MDL2 Assets" FontSize="19" Foreground="White"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="SUPERMERCADO POS" Foreground="White" FontSize="16" FontWeight="Bold" />
+            <TextBlock Text="Punto de venta local" Foreground="#B7C6D8" FontSize="12" Margin="0,2,0,0" />
+          </StackPanel>
         </StackPanel>
         <Border Grid.Column="1" Background="#1E3A5F" CornerRadius="16" Padding="12,7" VerticalAlignment="Center" Margin="0,0,18,0">
           <StackPanel Orientation="Horizontal">
@@ -41,7 +47,7 @@
     <TabControl x:Name="MainTabs" Grid.Row="1" Margin="18" TabStripPlacement="Left"
                 HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
                 SelectionChanged="MainTabs_SelectionChanged">
-      <TabItem x:Name="SalesTab" Header="Punto de venta">
+      <TabItem x:Name="SalesTab" Header="Punto de venta" Tag="&#xE7BF;">
         <Grid Margin="12">
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1.55*" />
@@ -112,21 +118,32 @@
                   </ItemsControl.ItemsPanel>
                   <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                      <Button Width="205" Height="122" Margin="0,0,10,10" Padding="0" Background="White"
+                      <Button Width="220" Height="140" Margin="0,0,12,12" Padding="0" Background="White"
                               BorderBrush="#EAECF0" BorderThickness="1" HorizontalContentAlignment="Stretch"
                               VerticalContentAlignment="Stretch" Tag="{Binding}" Click="Product_Click">
-                        <Border Padding="13" CornerRadius="9">
+                        <Border Padding="14" CornerRadius="11">
                           <Grid>
-                            <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
-                            <StackPanel>
-                              <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="#172B4D"
-                                         TextWrapping="Wrap" MaxHeight="42" />
-                              <TextBlock Text="{Binding Barcode}" FontSize="11" Foreground="#98A2B3" Margin="0,4,0,0" />
-                              <TextBlock Text="{Binding Stock, StringFormat='Stock: {0:N2}'}" FontSize="11"
-                                         Foreground="#667085" Margin="0,3,0,0" />
+                            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                            <Grid>
+                              <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                              <Border Background="#EEF4FF" CornerRadius="6" Padding="7,3" HorizontalAlignment="Left">
+                                <TextBlock Text="{Binding Category}" FontSize="10" FontWeight="SemiBold" Foreground="#175CD3" />
+                              </Border>
+                              <Border Grid.Column="1" Background="#F2F4F7" CornerRadius="6" Padding="7,3">
+                                <TextBlock Text="{Binding Unit}" FontSize="10" FontWeight="Bold" Foreground="#475467" />
+                              </Border>
+                            </Grid>
+                            <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,8,0,5">
+                              <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold" Foreground="#172B4D"
+                                         TextWrapping="Wrap" MaxHeight="40" />
+                              <TextBlock Text="{Binding Barcode}" FontSize="10" Foreground="#98A2B3" Margin="0,4,0,0" />
                             </StackPanel>
-                            <TextBlock Grid.Row="1" Text="{Binding UnitPrice, StringFormat=C0}" FontSize="16"
-                                       FontWeight="Bold" Foreground="#155EEF" Margin="0,9,0,0" />
+                            <Grid Grid.Row="2">
+                              <TextBlock Text="{Binding Stock, StringFormat='Existencias: {0:N2}'}" FontSize="10"
+                                         Foreground="#667085" VerticalAlignment="Center" />
+                              <TextBlock Text="{Binding UnitPrice, StringFormat=C0}" FontSize="16"
+                                         FontWeight="Bold" Foreground="#155EEF" HorizontalAlignment="Right" />
+                            </Grid>
                           </Grid>
                         </Border>
                       </Button>
@@ -149,7 +166,7 @@
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                 <StackPanel>
                   <TextBlock Text="Venta actual" FontSize="21" FontWeight="Bold" Foreground="#172B4D" />
-                  <TextBlock x:Name="CartCountText" Text="0 productos" FontSize="12" Foreground="#667085" Margin="0,3,0,0" />
+                  <TextBlock x:Name="CartCountText" Text="Venta vacía · lista para empezar" FontSize="12" Foreground="#667085" Margin="0,3,0,0" />
                 </StackPanel>
                 <Button Grid.Column="1" Content="Vaciar" Click="ClearCart_Click" Padding="10,6" />
               </Grid>
@@ -166,41 +183,74 @@
                   </StackPanel>
                 </Grid>
               </Border>
-              <ListBox x:Name="CartList" Grid.Row="2" ItemsSource="{Binding Cart}" BorderThickness="0"
-                       Background="Transparent" ScrollViewer.VerticalScrollBarVisibility="Auto">
-                <ListBox.ItemTemplate>
-                  <DataTemplate>
-                    <Border BorderBrush="#EAECF0" BorderThickness="0,0,0,1" Padding="0,10">
-                      <Grid>
-                        <Grid.ColumnDefinitions>
-                          <ColumnDefinition Width="*" />
-                          <ColumnDefinition Width="Auto" />
-                          <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel VerticalAlignment="Center">
-                          <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="#344054" TextWrapping="Wrap" />
-                          <TextBlock Text="{Binding UnitPrice, StringFormat=C0}" FontSize="12" Foreground="#667085" Margin="0,3,0,0" />
-                          <TextBlock Text="{Binding DiscountLabel}" FontSize="10" Foreground="#B54708" Margin="0,2,0,0" />
-                          <Button Content="Descuento" Padding="4,2" FontSize="10" Margin="0,3,0,0"
-                                  Tag="{Binding}" Click="Discount_Click" HorizontalAlignment="Left" />
-                        </StackPanel>
-                        <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
-                          <Button Content="−" Padding="8,4" Tag="{Binding}" Click="Decrease_Click" />
-                          <TextBlock Text="{Binding QuantityText}" VerticalAlignment="Center" MinWidth="58"
-                                     TextAlignment="Center" FontSize="12" />
-                          <Button Content="+" Padding="8,4" Tag="{Binding}" Click="Increase_Click" />
-                        </StackPanel>
-                        <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" MinWidth="82">
-                          <TextBlock Text="{Binding LineTotal, StringFormat=C0}" FontWeight="Bold"
-                                     Foreground="#172B4D" HorizontalAlignment="Right" />
-                          <Button Content="Quitar" Padding="3,2" FontSize="11" Background="Transparent"
-                                  Foreground="#B42318" Tag="{Binding}" Click="RemoveLine_Click" HorizontalAlignment="Right" />
-                        </StackPanel>
-                      </Grid>
+              <Grid Grid.Row="2">
+                <ListBox x:Name="CartList" ItemsSource="{Binding Cart}" BorderThickness="0"
+                         Background="Transparent" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                  <ListBox.ItemTemplate>
+                    <DataTemplate>
+                      <Border BorderBrush="#EAECF0" BorderThickness="0,0,0,1" Padding="0,10">
+                        <Grid>
+                          <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                          </Grid.ColumnDefinitions>
+                          <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="#344054" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding UnitPrice, StringFormat=C0}" FontSize="12" Foreground="#667085" Margin="0,3,0,0" />
+                            <TextBlock Text="{Binding DiscountLabel}" FontSize="10" Foreground="#B54708" Margin="0,2,0,0" />
+                            <Button Content="Descuento" Padding="4,2" FontSize="10" Margin="0,3,0,0"
+                                    Tag="{Binding}" Click="Discount_Click" HorizontalAlignment="Left" />
+                          </StackPanel>
+                          <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
+                            <Button Content="−" Padding="8,4" Tag="{Binding}" Click="Decrease_Click" />
+                            <TextBlock Text="{Binding QuantityText}" VerticalAlignment="Center" MinWidth="58"
+                                       TextAlignment="Center" FontSize="12" />
+                            <Button Content="+" Padding="8,4" Tag="{Binding}" Click="Increase_Click" />
+                          </StackPanel>
+                          <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" MinWidth="82">
+                            <TextBlock Text="{Binding LineTotal, StringFormat=C0}" FontWeight="Bold"
+                                       Foreground="#172B4D" HorizontalAlignment="Right" />
+                            <Button Content="Quitar" Padding="3,2" FontSize="11" Background="Transparent"
+                                    Foreground="#B42318" Tag="{Binding}" Click="RemoveLine_Click" HorizontalAlignment="Right" />
+                          </StackPanel>
+                        </Grid>
+                      </Border>
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="22"
+                            IsHitTestVisible="False">
+                  <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                      <Setter Property="Visibility" Value="Collapsed" />
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding Cart.Count}" Value="0">
+                          <Setter Property="Visibility" Value="Visible" />
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </StackPanel.Style>
+                  <Border Width="62" Height="62" Background="#EEF4FF" CornerRadius="20"
+                          HorizontalAlignment="Center" Margin="0,0,0,14">
+                    <TextBlock Text="&#xE7BF;" FontFamily="Segoe MDL2 Assets" FontSize="26" Foreground="#155EEF"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                  </Border>
+                  <TextBlock Text="Tu venta está vacía" FontSize="16" FontWeight="SemiBold"
+                             Foreground="#344054" HorizontalAlignment="Center" />
+                  <TextBlock Text="Elige un producto del catálogo o escanea su código."
+                             FontSize="12" Foreground="#98A2B3" TextAlignment="Center"
+                             TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0,6,0,16" />
+                  <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Border Background="#F2F4F7" CornerRadius="6" Padding="8,5" Margin="0,0,7,0">
+                      <TextBlock Text="F2  Buscar" FontSize="10" FontWeight="SemiBold" Foreground="#667085" />
                     </Border>
-                  </DataTemplate>
-                </ListBox.ItemTemplate>
-              </ListBox>
+                    <Border Background="#F2F4F7" CornerRadius="6" Padding="8,5">
+                      <TextBlock Text="F3  Escanear" FontSize="10" FontWeight="SemiBold" Foreground="#667085" />
+                    </Border>
+                  </StackPanel>
+                </StackPanel>
+              </Grid>
               <StackPanel Grid.Row="3" Margin="0,15,0,0">
                 <Grid Margin="0,0,0,6"><Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                   <TextBlock Text="Subtotal" Foreground="#667085" /><TextBlock x:Name="SubtotalText" Grid.Column="1" Foreground="#344054" />
@@ -229,7 +279,7 @@
         </Grid>
       </TabItem>
 
-      <TabItem x:Name="ShiftTab" Header="Turnos y caja">
+      <TabItem x:Name="ShiftTab" Header="Turnos y caja" Tag="&#xE8D7;">
         <Grid Margin="12">
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -320,7 +370,7 @@
         </Grid>
       </TabItem>
 
-      <TabItem x:Name="InventoryTab" Header="Inventario">
+      <TabItem x:Name="InventoryTab" Header="Inventario" Tag="&#xE7B8;">
         <Grid Margin="12">
           <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -374,7 +424,7 @@
         </Grid>
       </TabItem>
 
-      <TabItem x:Name="ReportsTab" Header="Reportes">
+      <TabItem x:Name="ReportsTab" Header="Reportes" Tag="&#xE9D2;">
         <Grid Margin="12">
           <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
           <Grid Margin="0,0,0,14">
@@ -433,7 +483,7 @@
             </Border>
             <Border Grid.Column="2" Background="White" CornerRadius="12" Padding="12">
               <TabControl TabStripPlacement="Top" Background="Transparent">
-                <TabItem Header="Productos" Width="125" Padding="8,7">
+                <TabItem Header="Productos" Tag="&#xE7B8;" Width="125" Padding="8,7">
                   <Grid Margin="4">
                     <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="*" /></Grid.RowDefinitions>
                     <DockPanel Margin="0,0,0,5">
@@ -460,7 +510,7 @@
                     </DockPanel>
                   </Grid>
                 </TabItem>
-                <TabItem Header="Cajeros" Width="125" Padding="8,7">
+                <TabItem Header="Cajeros" Tag="&#xE77B;" Width="125" Padding="8,7">
                   <DataGrid x:Name="CashierPerformanceGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False"
                             HeadersVisibility="Column" Background="White" BorderThickness="0" RowHeight="38" Margin="4">
                     <DataGrid.Columns>
@@ -470,7 +520,7 @@
                     </DataGrid.Columns>
                   </DataGrid>
                 </TabItem>
-                <TabItem Header="Turnos" Width="125" Padding="8,7">
+                <TabItem Header="Turnos" Tag="&#xE8D7;" Width="125" Padding="8,7">
                   <DataGrid x:Name="ShiftPerformanceGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False"
                             HeadersVisibility="Column" Background="White" BorderThickness="0" RowHeight="38" Margin="4">
                     <DataGrid.Columns>
@@ -487,7 +537,7 @@
         </Grid>
       </TabItem>
 
-      <TabItem x:Name="AuditTab" Header="Auditoría">
+      <TabItem x:Name="AuditTab" Header="Auditoría" Tag="&#xE8D4;">
         <Grid Margin="12">
           <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
           <Grid Margin="0,0,0,14">
@@ -512,7 +562,7 @@
         </Grid>
       </TabItem>
 
-      <TabItem x:Name="SyncTab" Header="Conectividad">
+      <TabItem x:Name="SyncTab" Header="Conectividad" Tag="&#xE703;">
         <Grid Margin="12">
           <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
           <Grid Margin="0,0,0,14">
@@ -558,7 +608,7 @@
         </Grid>
       </TabItem>
 
-      <TabItem x:Name="UsersTab" Header="Usuarios">
+      <TabItem x:Name="UsersTab" Header="Usuarios" Tag="&#xE77B;">
         <Grid Margin="12">
           <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /></Grid.RowDefinitions>
           <Grid Margin="0,0,0,14">
