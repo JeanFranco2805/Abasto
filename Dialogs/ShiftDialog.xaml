@@ -4,7 +4,7 @@
         Title="Turno de caja"
         Width="510" Height="450" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-        Background="#F3F5F8"
+        Background="#0D1724"
         FontFamily="Segoe UI">
   <Grid Margin="22">
     <Grid.RowDefinitions>
@@ -13,19 +13,19 @@
       <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
     <StackPanel Margin="0,0,0,15">
-      <TextBlock Text="Turno de caja" FontSize="24" FontWeight="Bold" Foreground="#172B4D" />
-      <TextBlock x:Name="ModeText" Foreground="#667085" Margin="0,4,0,0" />
+      <TextBlock Text="Turno de caja" FontSize="24" FontWeight="Bold" Foreground="#F0F4F8" />
+      <TextBlock x:Name="ModeText" Foreground="#A8B5C5" Margin="0,4,0,0" />
     </StackPanel>
-    <Border Grid.Row="1" Background="White" CornerRadius="12" Padding="18">
+    <Border Grid.Row="1" Background="#152438" CornerRadius="12" Padding="18">
       <StackPanel>
-        <TextBlock Text="Acción" FontWeight="SemiBold" Foreground="#344054" Margin="0,0,0,5" />
+        <TextBlock Text="Acción" FontWeight="SemiBold" Foreground="#D6E0EB" Margin="0,0,0,5" />
         <ComboBox x:Name="ActionBox" SelectionChanged="Action_SelectionChanged" Margin="0,0,0,14" />
-        <TextBlock x:Name="ExpectedText" Foreground="#475467" FontWeight="SemiBold" Margin="0,0,0,10" />
-        <TextBlock x:Name="AmountLabel" Text="Valor" FontWeight="SemiBold" Foreground="#344054" Margin="0,0,0,5" />
+        <TextBlock x:Name="ExpectedText" Foreground="#C3CFDC" FontWeight="SemiBold" Margin="0,0,0,10" />
+        <TextBlock x:Name="AmountLabel" Text="Valor" FontWeight="SemiBold" Foreground="#D6E0EB" Margin="0,0,0,5" />
         <TextBox x:Name="AmountBox" Text="0" Margin="0,0,0,12" />
-        <TextBlock Text="Motivo (obligatorio para entrada o salida)" FontWeight="SemiBold" Foreground="#344054" Margin="0,0,0,5" />
+        <TextBlock Text="Motivo (obligatorio para entrada o salida)" FontWeight="SemiBold" Foreground="#D6E0EB" Margin="0,0,0,5" />
         <TextBox x:Name="ReasonBox" MinHeight="64" TextWrapping="Wrap" AcceptsReturn="True" VerticalContentAlignment="Top" />
-        <TextBlock x:Name="ErrorText" Foreground="#B42318" TextWrapping="Wrap" Margin="0,10,0,0" />
+        <TextBlock x:Name="ErrorText" Foreground="#FFB4AB" TextWrapping="Wrap" Margin="0,10,0,0" />
       </StackPanel>
     </Border>
     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
