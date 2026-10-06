@@ -34,6 +34,10 @@
               <Trigger Property="IsPressed" Value="True">
                 <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.74" />
               </Trigger>
+              <Trigger Property="IsKeyboardFocused" Value="True">
+                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="#84ADFF" />
+                <Setter TargetName="ButtonBorder" Property="BorderThickness" Value="2" />
+              </Trigger>
               <Trigger Property="IsEnabled" Value="False">
                 <Setter TargetName="ButtonBorder" Property="Opacity" Value="0.45" />
               </Trigger>
@@ -47,9 +51,9 @@
       <Setter Property="BorderThickness" Value="0" />
     </Style>
     <Style TargetType="TabItem">
-      <Setter Property="Width" Value="190" />
-      <Setter Property="Padding" Value="16,13" />
-      <Setter Property="Margin" Value="4,3" />
+      <Setter Property="Width" Value="218" />
+      <Setter Property="Padding" Value="15,13" />
+      <Setter Property="Margin" Value="5,3" />
       <Setter Property="Foreground" Value="#475467" />
       <Setter Property="FontSize" Value="14" />
       <Setter Property="FontWeight" Value="SemiBold" />
@@ -58,11 +62,24 @@
         <Setter.Value>
           <ControlTemplate TargetType="TabItem">
             <Border x:Name="TabBorder" Background="Transparent" CornerRadius="9" Padding="{TemplateBinding Padding}">
-              <ContentPresenter ContentSource="Header" VerticalAlignment="Center" HorizontalAlignment="Left" />
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="3" />
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border x:Name="SelectionMark" Background="#155EEF" CornerRadius="2" Margin="0,4" Visibility="Collapsed" />
+                <TextBlock Grid.Column="1" Text="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
+                           FontFamily="Segoe MDL2 Assets" FontSize="16" Foreground="{TemplateBinding Foreground}"
+                           VerticalAlignment="Center" Margin="11,0,11,0" />
+                <ContentPresenter Grid.Column="2" ContentSource="Header" VerticalAlignment="Center"
+                                  HorizontalAlignment="Left" />
+              </Grid>
             </Border>
             <ControlTemplate.Triggers>
               <Trigger Property="IsSelected" Value="True">
                 <Setter TargetName="TabBorder" Property="Background" Value="#EAF1FF" />
+                <Setter TargetName="SelectionMark" Property="Visibility" Value="Visible" />
                 <Setter Property="Foreground" Value="#155EEF" />
               </Trigger>
               <Trigger Property="IsMouseOver" Value="True">
