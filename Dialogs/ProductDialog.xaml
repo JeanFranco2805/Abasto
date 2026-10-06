@@ -4,7 +4,7 @@
         Title="Producto"
         Width="560" Height="620" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-        Background="#F3F5F8"
+        Background="#0D1724"
         FontFamily="Segoe UI">
   <Grid Margin="22">
     <Grid.RowDefinitions>
@@ -13,10 +13,10 @@
       <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
     <StackPanel Margin="0,0,0,15">
-      <TextBlock x:Name="TitleText" Text="Producto" FontSize="24" FontWeight="Bold" Foreground="#172B4D" />
-      <TextBlock Text="Catálogo e inventario de la caja local" Foreground="#667085" Margin="0,4,0,0" />
+      <TextBlock x:Name="TitleText" Text="Producto" FontSize="24" FontWeight="Bold" Foreground="#F0F4F8" />
+      <TextBlock Text="Catálogo e inventario de la caja local" Foreground="#A8B5C5" Margin="0,4,0,0" />
     </StackPanel>
-    <Border Grid.Row="1" Background="White" CornerRadius="12" Padding="18">
+    <Border Grid.Row="1" Background="#152438" CornerRadius="12" Padding="18">
       <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel>
           <TextBlock Text="Código de barras" Style="{StaticResource FieldLabel}" />
@@ -52,7 +52,7 @@
           </Grid>
           <TextBlock Text="Alerta de inventario cuando queden" Style="{StaticResource FieldLabel}" Margin="0,12,0,5" />
           <TextBox x:Name="MinimumStockBox" Text="0" />
-          <TextBlock x:Name="ErrorText" Foreground="#B42318" TextWrapping="Wrap" Margin="0,12,0,0" />
+          <TextBlock x:Name="ErrorText" Foreground="#FFB4AB" TextWrapping="Wrap" Margin="0,12,0,0" />
         </StackPanel>
       </ScrollViewer>
     </Border>
