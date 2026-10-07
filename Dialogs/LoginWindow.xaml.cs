@@ -1,14 +1,14 @@
 using System.Windows;
-using SupermercadoPOS.Services;
+using Abasto.Services;
 
-namespace SupermercadoPOS.Dialogs;
+namespace Abasto.Dialogs;
 
 public partial class LoginWindow : Window
 {
     public LoginWindow()
     {
         InitializeComponent();
-        Loaded += (_, _) => PinBox.Focus();
+        Loaded += (_, _) => UsernameBox.Focus();
     }
 
     private async void Login_Click(object sender, RoutedEventArgs e)
