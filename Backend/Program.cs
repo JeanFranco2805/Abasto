@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-using Backend.Data;
-using Backend.Domain;
+using Abasto.Backend.Data;
+using Abasto.Backend.Domain;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -78,7 +78,7 @@ await using (var scope = app.Services.CreateAsyncScope())
         await db.SaveChangesAsync();
 }
 
-app.MapGet("/health", () => Results.Ok(new { status = "ok", service = "SupermercadoPOS.Backend", utc = DateTime.UtcNow }));
+app.MapGet("/health", () => Results.Ok(new { status = "ok", service = "Abasto.Backend", utc = DateTime.UtcNow }));
 
 app.MapGet("/api/sync/summary", async (HttpRequest request, IConfiguration configuration, CentralDbContext db) =>
 {
