@@ -17,6 +17,17 @@ public sealed record PaymentDraft(
     decimal Tendered,
     decimal Change);
 
+public sealed record SaleReturnLineDraft(long SaleItemId, decimal Quantity);
+
+public sealed record FiscalProviderResult(
+    string Provider,
+    string DocumentNumber,
+    string ProviderDocumentId,
+    string Status,
+    string ResponsePayload);
+
+public sealed record FiscalProviderStatus(bool Configured, string ProviderName);
+
 public sealed record SalesSummary(
     int SaleCount,
     decimal GrossSales,
