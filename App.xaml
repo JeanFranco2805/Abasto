@@ -130,15 +130,15 @@
             </Border>
             <ControlTemplate.Triggers>
               <Trigger Property="IsMouseOver" Value="True">
-                        <Setter TargetName="TabBorder" Property="Background" Value="#202B2F" />
+                <Setter TargetName="TabBorder" Property="Background" Value="#202B2F" />
                 <Setter Property="Foreground" Value="#EEF2EF" />
-                        <Setter TargetName="TabIcon" Property="Foreground" Value="#71CABB" />
+                <Setter TargetName="TabIcon" Property="Foreground" Value="#71CABB" />
               </Trigger>
               <Trigger Property="IsKeyboardFocused" Value="True">
                 <Setter TargetName="TabBorder" Property="BorderBrush" Value="#71CABB" />
               </Trigger>
               <Trigger Property="IsSelected" Value="True">
-                <Setter TargetName="TabBorder" Property="Background" Value="#202C30" />
+                <Setter TargetName="TabBorder" Property="Background" Value="#17282D" />
                 <Setter Property="Foreground" Value="#EEF2EF" />
                 <Setter TargetName="TabIcon" Property="Foreground" Value="#71CABB" />
                 <Setter TargetName="SelectionMark" Property="Visibility" Value="Visible" />
