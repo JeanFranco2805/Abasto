@@ -41,6 +41,16 @@ public static class PosService
             db.Users.Add(CreateUser("admin", "Administrador de demostración", "2468", "Administrador"));
             await db.SaveChangesAsync();
         }
+
+        var hasProductSnapshot = await db.SyncQueue.AnyAsync(item => item.EntityType == "Product"
+            && (item.Operation == "ProductSnapshot" || item.Operation == "ProductCreated" || item.Operation == "ProductUpdated"));
+        if (!hasProductSnapshot)
+        {
+            var products = await db.Products.AsNoTracking().ToListAsync();
+            foreach (var product in products)
+                db.SyncQueue.Add(CreateSyncEvent("Product", product.Id.ToString(), "ProductSnapshot", ProductPayload(product)));
+            await db.SaveChangesAsync();
+        }
     }
 
     private static async Task EnsureProductImageColumnAsync(PosDbContext db)
@@ -233,6 +243,7 @@ public static class PosService
         {
             db.Products.Add(product);
             await db.SaveChangesAsync();
+            db.SyncQueue.Add(CreateSyncEvent("Product", product.Id.ToString(), "ProductCreated", ProductPayload(product)));
             await AddAuditAsync(db, "Producto creado", $"{product.Name} ({product.Barcode})");
         }
         else
@@ -251,6 +262,7 @@ public static class PosService
             stored.IsActive = product.IsActive;
             stored.UpdatedAtUtc = DateTime.UtcNow;
             await db.SaveChangesAsync();
+            db.SyncQueue.Add(CreateSyncEvent("Product", stored.Id.ToString(), "ProductUpdated", ProductPayload(stored)));
             await AddAuditAsync(db, "Producto actualizado", $"{stored.Name} ({stored.Barcode})");
         }
         await CreateDailyBackupAsync(App.DatabasePath);
@@ -289,6 +301,7 @@ public static class PosService
         };
         db.CashShifts.Add(shift);
         await db.SaveChangesAsync();
+        db.SyncQueue.Add(CreateSyncEvent("CashShift", shift.Id.ToString(), "CashShiftOpened", shift));
         await AddAuditAsync(db, "Turno abierto", $"Fondo inicial: {openingFloat:C0}");
         await CreateDailyBackupAsync(App.DatabasePath);
     }
@@ -327,7 +340,7 @@ public static class PosService
         await using var db = App.CreateDbContext();
         var shift = await db.CashShifts.FirstOrDefaultAsync(s => s.CashierId == user.Id && s.Status == "Abierto")
             ?? throw new InvalidOperationException("No tienes un turno abierto.");
-        db.CashMovements.Add(new CashMovement
+        var movement = new CashMovement
         {
             CashShiftId = shift.Id,
             UserId = user.Id,
@@ -335,8 +348,10 @@ public static class PosService
             IsCashIn = isCashIn,
             Amount = Money(amount),
             Reason = reason.Trim()
-        });
+        };
+        db.CashMovements.Add(movement);
         await db.SaveChangesAsync();
+        db.SyncQueue.Add(CreateSyncEvent("CashMovement", movement.Id.ToString(), "CashMovementRegistered", movement));
         await AddAuditAsync(db, isCashIn ? "Entrada de efectivo" : "Salida de efectivo", $"{amount:C0} - {reason.Trim()}");
         await CreateDailyBackupAsync(App.DatabasePath);
     }
@@ -353,6 +368,7 @@ public static class PosService
         shift.Status = "Cerrado";
         shift.ClosedAtUtc = DateTime.UtcNow;
         await db.SaveChangesAsync();
+        db.SyncQueue.Add(CreateSyncEvent("CashShift", shift.Id.ToString(), "CashShiftClosed", shift));
         await AddAuditAsync(db, "Turno cerrado",
             $"Esperado: {shift.ExpectedCash:C0}; contado: {shift.CountedCash:C0}; diferencia: {shift.Difference:C0}");
         await CreateDailyBackupAsync(App.DatabasePath);
@@ -525,13 +541,7 @@ public static class PosService
             sale.Subtotal += subtotal;
             sale.DiscountTotal += discount;
             sale.TaxTotal += tax;
-            db.SyncQueue.Add(new SyncQueueItem
-            {
-                EntityType = "Product",
-                EntityId = product.Id.ToString(),
-                Operation = "StockUpdated",
-                Payload = JsonSerializer.Serialize(new { product.Id, product.Barcode, product.Stock, updatedAtUtc = product.UpdatedAtUtc })
-            });
+            db.SyncQueue.Add(CreateSyncEvent("Product", product.Id.ToString(), "ProductStockUpdated", ProductPayload(product)));
         }
 
         sale.Subtotal = Money(sale.Subtotal);
@@ -558,25 +568,20 @@ public static class PosService
         if (!suspendedSaleId.HasValue)
             db.Sales.Add(sale);
         await db.SaveChangesAsync();
-        db.SyncQueue.Add(new SyncQueueItem
-        {
-            EntityType = "Sale",
-            EntityId = sale.Id.ToString(),
-            Operation = "SaleCompleted",
-            Payload = JsonSerializer.Serialize(new
+        db.SyncQueue.Add(CreateSyncEvent("Sale", sale.Id.ToString(), "SaleCompleted", new
             {
                 sale.Id,
                 sale.CreatedAtUtc,
+                sale.Status,
                 sale.CashierId,
                 sale.CashierName,
                 sale.Subtotal,
                 sale.DiscountTotal,
                 sale.TaxTotal,
                 sale.Total,
-                Items = sale.Items.Select(i => new { i.ProductId, i.Barcode, i.ProductName, i.Quantity, i.UnitPrice, i.TaxRate, i.DiscountAmount, i.DiscountApprovedBy, i.LineTotal }),
+                Items = sale.Items.Select(i => new { i.ProductId, i.Barcode, i.ProductName, i.Unit, i.Quantity, i.UnitPrice, i.TaxRate, i.DiscountAmount, i.DiscountApprovedBy, i.LineSubtotal, i.LineTax, i.LineTotal }),
                 Payments = sale.Payments.Select(p => new { p.Method, p.Amount, p.Tendered, p.Change })
-            })
-        });
+            }));
         await AddAuditAsync(db, "Venta completada", $"Venta #{sale.Id} por {sale.Total:C0}");
         await db.SaveChangesAsync();
         await transaction.CommitAsync();
@@ -623,6 +628,7 @@ public static class PosService
                 ?? throw new InvalidOperationException($"No se encontró el producto {item.ProductName} para reponer inventario.");
             product.Stock += item.Quantity;
             product.UpdatedAtUtc = DateTime.UtcNow;
+            db.SyncQueue.Add(CreateSyncEvent("Product", product.Id.ToString(), "ProductStockUpdated", ProductPayload(product)));
         }
 
         var refund = Money(sale.Payments.Sum(p => p.Amount));
@@ -636,13 +642,7 @@ public static class PosService
             Amount = refund,
             Reason = $"Devolución por anulación de venta #{sale.Id}"
         });
-        db.SyncQueue.Add(new SyncQueueItem
-        {
-            EntityType = "Sale",
-            EntityId = sale.Id.ToString(),
-            Operation = "SaleVoided",
-            Payload = JsonSerializer.Serialize(new { sale.Id, sale.Status, refundedAmount = refund })
-        });
+        db.SyncQueue.Add(CreateSyncEvent("Sale", sale.Id.ToString(), "SaleVoided", new { sale.Id, sale.Status, sale.CreatedAtUtc, refundedAmount = refund }));
         await AddAuditAsync(db, "Venta anulada",
             $"Venta #{sale.Id}; devolución en efectivo: {refund:C0}; autorizó {supervisor.DisplayName}");
         await db.SaveChangesAsync();
@@ -807,6 +807,29 @@ public static class PosService
         });
         await db.SaveChangesAsync();
     }
+
+    private static SyncQueueItem CreateSyncEvent(string entityType, string entityId, string operation, object payload) => new()
+    {
+        EntityType = entityType,
+        EntityId = entityId,
+        Operation = operation,
+        Payload = JsonSerializer.Serialize(payload)
+    };
+
+    private static object ProductPayload(Product product) => new
+    {
+        product.Id,
+        product.Barcode,
+        product.Name,
+        product.Category,
+        product.Unit,
+        product.UnitPrice,
+        product.TaxRate,
+        product.Stock,
+        product.MinimumStock,
+        product.IsActive,
+        product.UpdatedAtUtc
+    };
 
     private static PosUser CreateUser(string username, string displayName, string pin, string role)
     {
