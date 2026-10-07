@@ -1,7 +1,7 @@
 using System.IO;
 using System.Text.Json;
 
-namespace SupermercadoPOS.Services;
+namespace Abasto.Services;
 
 public sealed record BackendSettings(string BaseUrl, string ApiKey, string ClientId);
 
