@@ -33,6 +33,7 @@ public sealed class PosDbContext(DbContextOptions<PosDbContext> options) : DbCon
         modelBuilder.Entity<SyncQueueItem>().HasIndex(q => new { q.Status, q.CreatedAtUtc });
 
         modelBuilder.Entity<Product>().Property(p => p.UnitPrice).HasPrecision(18, 2);
+        modelBuilder.Entity<Product>().Property(p => p.ImagePath).HasMaxLength(512).HasDefaultValue("");
         modelBuilder.Entity<Product>().Property(p => p.TaxRate).HasPrecision(6, 4);
         modelBuilder.Entity<Product>().Property(p => p.Stock).HasPrecision(18, 3);
         modelBuilder.Entity<Product>().Property(p => p.MinimumStock).HasPrecision(18, 3);
