@@ -406,6 +406,7 @@
             <StackPanel>
               <TextBlock Text="Inventario y catálogo" FontSize="23" FontWeight="Bold" Foreground="#F1F4F8" />
               <TextBlock x:Name="InventorySummaryText" Foreground="#9AA9BB" FontSize="13" Margin="0,4,0,0" />
+              <TextBlock x:Name="InventoryDataSourceText" Text="Fuente: base local" Foreground="#8FB4EA" FontSize="11" Margin="0,4,0,0" />
             </StackPanel>
             <Button x:Name="EditInventoryButton" Grid.Column="1" Content="Editar producto"
                     Click="EditProduct_Click" IsEnabled="False" Margin="10,0,0,0" />
@@ -657,6 +658,7 @@
             <StackPanel>
               <TextBlock Text="Reportes de ventas" FontSize="22" FontWeight="Bold" Foreground="#F1F4F8" />
               <TextBlock Text="Filtra el periodo y consulta ventas, medios de pago y productos." Foreground="#9AA9BB" Margin="0,4,0,0" />
+              <TextBlock x:Name="ReportsDataSourceText" Text="Fuente: base local" Foreground="#8FB4EA" FontSize="11" Margin="0,4,0,0" />
             </StackPanel>
             <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,8,0">
               <TextBlock Text="Desde" FontSize="11" FontWeight="SemiBold" Foreground="#9AA9BB" Margin="0,0,0,3" />
