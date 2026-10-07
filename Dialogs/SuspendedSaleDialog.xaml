@@ -4,17 +4,17 @@
         Title="Reanudar venta"
         Width="760" Height="540" ResizeMode="CanResize"
         WindowStartupLocation="CenterOwner"
-        Background="#11191E"
+        Background="#101722"
         FontFamily="Segoe UI">
   <Grid Margin="22">
     <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
     <StackPanel Margin="0,0,0,14">
-      <TextBlock Text="Ventas suspendidas" FontSize="24" FontWeight="Bold" Foreground="#EEF2EF" />
-      <TextBlock Text="Selecciona una venta para continuar el cobro." Foreground="#A1AEAB" Margin="0,4,0,0" />
+      <TextBlock Text="Ventas suspendidas" FontSize="24" FontWeight="Bold" Foreground="#F1F4F8" />
+      <TextBlock Text="Selecciona una venta para continuar el cobro." Foreground="#9AA9BB" Margin="0,4,0,0" />
     </StackPanel>
     <DataGrid x:Name="SalesGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True"
               CanUserAddRows="False" SelectionMode="Single" HeadersVisibility="Column"
-              Background="#1A252A" BorderBrush="#303A3D" RowHeight="42">
+              Background="#1B2938" BorderBrush="#2E3D52" RowHeight="42">
       <DataGrid.Columns>
         <DataGridTextColumn Header="Venta" Binding="{Binding Id}" Width="90" />
         <DataGridTextColumn Header="Suspendida" Binding="{Binding CreatedAtUtc, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="190" />
@@ -25,7 +25,7 @@
     </DataGrid>
     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
       <Button Content="Cancelar" Click="Cancel_Click" Margin="0,0,10,0" />
-      <Button Content="Reanudar venta" Click="Resume_Click" Background="#36A995" Foreground="White" />
+      <Button Content="Reanudar venta" Click="Resume_Click" Background="#2E6BC7" Foreground="White" />
     </StackPanel>
   </Grid>
 </Window>
