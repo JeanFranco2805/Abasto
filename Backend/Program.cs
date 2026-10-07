@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using Abasto.Backend.Data;
 using Abasto.Backend.Domain;
+using Abasto.Backend.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -51,6 +52,7 @@ builder.Services.AddDbContext<CentralDbContext>(options =>
     else
         throw new InvalidOperationException("Database:Provider debe ser Sqlite o PostgreSql.");
 });
+builder.Services.AddSingleton<ElectronicInvoicingProvider>();
 builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.PropertyNameCaseInsensitive = true);
 
@@ -79,6 +81,13 @@ await using (var scope = app.Services.CreateAsyncScope())
 }
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok", service = "Abasto.Backend", utc = DateTime.UtcNow }));
+
+app.MapGet("/api/fiscal/status", (HttpRequest request, IConfiguration configuration, ElectronicInvoicingProvider provider) =>
+{
+    if (!IsAuthorized(request, configuration))
+        return Results.Unauthorized();
+    return Results.Ok(new { configured = provider.IsConfigured, providerName = provider.IsConfigured ? provider.ProviderName : "" });
+});
 
 app.MapGet("/api/sync/summary", async (HttpRequest request, IConfiguration configuration, CentralDbContext db) =>
 {
@@ -197,6 +206,83 @@ app.MapGet("/api/sales", async (HttpRequest request, IConfiguration configuratio
         .Take(Math.Clamp(take ?? 100, 1, 500)).ToListAsync());
 });
 
+app.MapPost("/api/fiscal/invoices", async (
+    HttpRequest request,
+    IConfiguration configuration,
+    CentralDbContext db,
+    ElectronicInvoicingProvider provider,
+    FiscalSaleRequest body,
+    CancellationToken cancellationToken) =>
+{
+    if (!IsAuthorized(request, configuration))
+        return Results.Unauthorized();
+    if (string.IsNullOrWhiteSpace(body.ClientId) || body.SaleId <= 0)
+        return Results.BadRequest(new { error = "Caja y número de venta son obligatorios." });
+    var sale = await db.Sales.AsNoTracking().FirstOrDefaultAsync(item =>
+        item.ClientId == body.ClientId && item.LocalSaleId == body.SaleId, cancellationToken);
+    if (sale is null)
+        return Results.NotFound(new { error = "La venta no está sincronizada con el backend." });
+    if (sale.Status is "Anulada" or "Devuelta")
+        return Results.BadRequest(new { error = "No se puede facturar una venta anulada o devuelta por completo." });
+    if (await HasIssuedInvoiceAsync(db, body.ClientId, body.SaleId, cancellationToken))
+        return Results.Conflict(new { error = "La venta ya tiene una factura electrónica emitida." });
+    try
+    {
+        return Results.Ok(await provider.IssueInvoiceAsync(body.ClientId, body.SaleId, sale.Payload, cancellationToken));
+    }
+    catch (InvalidOperationException exception)
+    {
+        return Results.Problem(exception.Message, statusCode: StatusCodes.Status503ServiceUnavailable);
+    }
+    catch (Exception exception) when (exception is HttpRequestException or InvalidDataException or JsonException)
+    {
+        return Results.Problem(exception.Message, statusCode: StatusCodes.Status502BadGateway);
+    }
+});
+
+app.MapPost("/api/fiscal/credit-notes", async (
+    HttpRequest request,
+    IConfiguration configuration,
+    CentralDbContext db,
+    ElectronicInvoicingProvider provider,
+    FiscalCreditNoteRequest body,
+    CancellationToken cancellationToken) =>
+{
+    if (!IsAuthorized(request, configuration))
+        return Results.Unauthorized();
+    if (string.IsNullOrWhiteSpace(body.ClientId) || body.SaleId <= 0 || body.ReturnId <= 0)
+        return Results.BadRequest(new { error = "Caja, venta y devolución son obligatorias." });
+    var sale = await db.Sales.AsNoTracking().FirstOrDefaultAsync(item =>
+        item.ClientId == body.ClientId && item.LocalSaleId == body.SaleId, cancellationToken);
+    if (sale is null)
+        return Results.NotFound(new { error = "La venta no está sincronizada con el backend." });
+    var returnEvent = await db.SyncEvents.AsNoTracking().FirstOrDefaultAsync(item =>
+        item.ClientId == body.ClientId && item.EntityType == "SaleReturn"
+        && item.EntityId == body.ReturnId.ToString()
+        && item.Operation == "SaleReturnCompleted", cancellationToken);
+    if (returnEvent is null)
+        return Results.NotFound(new { error = "La devolución no está sincronizada con el backend." });
+    if (ReadFiscalLong(returnEvent.Payload, "SaleId") != body.SaleId)
+        return Results.BadRequest(new { error = "La devolución no pertenece a la venta indicada." });
+    if (!await HasIssuedInvoiceAsync(db, body.ClientId, body.SaleId, cancellationToken))
+        return Results.Conflict(new { error = "Emite primero la factura electrónica original." });
+    if (await HasIssuedCreditNoteAsync(db, body.ClientId, body.ReturnId, cancellationToken))
+        return Results.Conflict(new { error = "La devolución ya tiene una nota crédito emitida." });
+    try
+    {
+        return Results.Ok(await provider.IssueCreditNoteAsync(
+            body.ClientId, body.SaleId, body.ReturnId, sale.Payload, returnEvent.Payload, cancellationToken));
+    }
+    catch (InvalidOperationException exception)
+    {
+        return Results.Problem(exception.Message, statusCode: StatusCodes.Status503ServiceUnavailable);
+    }
+    catch (Exception exception) when (exception is HttpRequestException or InvalidDataException or JsonException)
+    {
+        return Results.Problem(exception.Message, statusCode: StatusCodes.Status502BadGateway);
+    }
+});
+
 app.Run();
 
 static bool IsAuthorized(HttpRequest request, IConfiguration configuration)
@@ -211,6 +297,44 @@ static bool IsAuthorized(HttpRequest request, IConfiguration configuration)
     var suppliedBytes = Encoding.UTF8.GetBytes(supplied.ToString());
     return expectedBytes.Length == suppliedBytes.Length
         && CryptographicOperations.FixedTimeEquals(expectedBytes, suppliedBytes);
+}
+
+static async Task<bool> HasIssuedInvoiceAsync(CentralDbContext db, string clientId, long saleId, CancellationToken cancellationToken)
+{
+    var payloads = await db.SyncEvents.AsNoTracking()
+        .Where(item => item.ClientId == clientId && item.EntityType == "FiscalDocument" && item.Operation == "FiscalDocumentIssued")
+        .Select(item => item.Payload).ToListAsync(cancellationToken);
+    return payloads.Any(payload => ReadFiscalLong(payload, "SaleId") == saleId
+        && ReadFiscalString(payload, "Kind") == "Factura"
+        && ReadFiscalString(payload, "Status") == "Emitida");
+}
+
+static async Task<bool> HasIssuedCreditNoteAsync(CentralDbContext db, string clientId, long returnId, CancellationToken cancellationToken)
+{
+    var payloads = await db.SyncEvents.AsNoTracking()
+        .Where(item => item.ClientId == clientId && item.EntityType == "FiscalDocument" && item.Operation == "FiscalDocumentIssued")
+        .Select(item => item.Payload).ToListAsync(cancellationToken);
+    return payloads.Any(payload => ReadFiscalLong(payload, "SaleReturnId") == returnId
+        && ReadFiscalString(payload, "Kind") == "Nota crédito"
+        && ReadFiscalString(payload, "Status") == "Emitida");
+}
+
+static long? ReadFiscalLong(string payload, string name)
+{
+    using var document = JsonDocument.Parse(payload);
+    foreach (var property in document.RootElement.EnumerateObject())
+        if (property.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && property.Value.TryGetInt64(out var value))
+            return value;
+    return null;
+}
+
+static string? ReadFiscalString(string payload, string name)
+{
+    using var document = JsonDocument.Parse(payload);
+    foreach (var property in document.RootElement.EnumerateObject())
+        if (property.Name.Equals(name, StringComparison.OrdinalIgnoreCase) && property.Value.ValueKind == JsonValueKind.String)
+            return property.Value.GetString();
+    return null;
 }
 
 static async Task ProjectEventAsync(CentralDbContext db, CentralSyncEvent syncEvent)
@@ -277,6 +401,8 @@ static async Task ProjectEventAsync(CentralDbContext db, CentralSyncEvent syncEv
         sale.Status = "Anulada";
     else if (syncEvent.Operation.Equals("SaleCompleted", StringComparison.OrdinalIgnoreCase))
         sale.Status = "Completada";
+    else if (syncEvent.Operation.Equals("SaleReturned", StringComparison.OrdinalIgnoreCase))
+        sale.Status = ReadString(saleRoot, "status") ?? sale.Status;
     sale.CreatedAtUtc = ReadDate(saleRoot, "createdAtUtc") ?? sale.CreatedAtUtc;
     sale.CashierId = ReadInt(saleRoot, "cashierId") ?? sale.CashierId;
     sale.CashierName = ReadString(saleRoot, "cashierName") ?? sale.CashierName;
@@ -285,7 +411,8 @@ static async Task ProjectEventAsync(CentralDbContext db, CentralSyncEvent syncEv
     sale.TaxTotal = ReadDecimal(saleRoot, "taxTotal") ?? sale.TaxTotal;
     sale.Total = ReadDecimal(saleRoot, "total") ?? sale.Total;
     if (syncEvent.Operation.Equals("SaleCompleted", StringComparison.OrdinalIgnoreCase)
-        || syncEvent.Operation.Equals("SaleVoided", StringComparison.OrdinalIgnoreCase))
+        || syncEvent.Operation.Equals("SaleVoided", StringComparison.OrdinalIgnoreCase)
+        || syncEvent.Operation.Equals("SaleReturned", StringComparison.OrdinalIgnoreCase))
         sale.Payload = syncEvent.Payload;
 }
 
@@ -320,3 +447,6 @@ static bool TryProperty(JsonElement element, string name, out JsonElement value)
     value = default;
     return false;
 }
+
+public sealed record FiscalSaleRequest(string ClientId, long SaleId);
+public sealed record FiscalCreditNoteRequest(string ClientId, long SaleId, long ReturnId);
