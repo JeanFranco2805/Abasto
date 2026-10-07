@@ -3,16 +3,16 @@ using System.Security.Cryptography;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
-using SupermercadoPOS.Data;
-using SupermercadoPOS.Domain;
+using Abasto.Data;
+using Abasto.Domain;
 
-namespace SupermercadoPOS.Services;
+namespace Abasto.Services;
 
 public static class PosService
 {
     private const int PinIterations = 120_000;
     private static readonly SemaphoreSlim BackupLock = new(1, 1);
-    private static readonly string[] DemoProductBarcodes =
+    private static readonly string[] LegacySampleProductBarcodes =
     [
         "7701001000011", "7701001000012", "7701001000013", "7701001000014",
         "7701001000015", "7701001000016", "7701001000017", "7701001000018"
@@ -24,13 +24,7 @@ public static class PosService
         await db.Database.EnsureCreatedAsync();
         await EnsureProductImageColumnAsync(db);
 
-        await RemoveDemoDataAsync(db);
-
-        if (!await db.Users.AnyAsync())
-        {
-            db.Users.Add(CreateUser("admin", "Administrador", "2468", "Administrador"));
-            await db.SaveChangesAsync();
-        }
+        await RemoveLegacySampleDataAsync(db);
 
         var hasProductSnapshot = await db.SyncQueue.AnyAsync(item => item.EntityType == "Product"
             && (item.Operation == "ProductSnapshot" || item.Operation == "ProductCreated" || item.Operation == "ProductUpdated"));
@@ -43,10 +37,30 @@ public static class PosService
         }
     }
 
-    private static async Task RemoveDemoDataAsync(PosDbContext db)
+    public static async Task<bool> HasUsersAsync()
+    {
+        await using var db = App.CreateDbContext();
+        return await db.Users.AnyAsync();
+    }
+
+    public static async Task CreateInitialAdministratorAsync(string username, string displayName, string pin)
+    {
+        username = username.Trim().ToLowerInvariant();
+        displayName = displayName.Trim();
+        ValidateUserInput(username, displayName, "Administrador", pin);
+
+        await using var db = App.CreateDbContext();
+        if (await db.Users.AnyAsync())
+            throw new InvalidOperationException("Ya existe una cuenta. Inicia sesión para continuar.");
+
+        db.Users.Add(CreateUser(username, displayName, pin, "Administrador"));
+        await db.SaveChangesAsync();
+    }
+
+    private static async Task RemoveLegacySampleDataAsync(PosDbContext db)
     {
         var demoProducts = await db.Products
-            .Where(product => DemoProductBarcodes.Contains(product.Barcode))
+            .Where(product => LegacySampleProductBarcodes.Contains(product.Barcode))
             .ToListAsync();
         if (demoProducts.Count > 0)
         {
@@ -136,7 +150,6 @@ public static class PosService
                 source.BackupDatabase(destination);
             }
 
-            // Pooling is disabled above so the destination file handle is closed before the rename.
             File.Move(temporaryPath, backupPath, true);
             temporaryPath = null;
 
