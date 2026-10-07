@@ -20,6 +20,7 @@ public partial class MainWindow : Window
     private CashShift? _openShift;
     private long? _currentSuspendedSaleId;
     private readonly DispatcherTimer _syncTimer = new() { Interval = TimeSpan.FromSeconds(45) };
+    private readonly SerialScaleService _serialScale = new();
 
     public ObservableCollection<Product> DisplayProducts { get; } = [];
     public ObservableCollection<InventoryProductCard> InventoryProducts { get; } = [];
@@ -132,6 +133,32 @@ public partial class MainWindow : Window
         AddToCart(product);
         BarcodeBox.Clear();
         BarcodeBox.Focus();
+    }
+
+    private async void ReadScale_Click(object sender, RoutedEventArgs e)
+    {
+        if (CartList.SelectedItem is not CartLineViewModel line
+            || !(line.Unit.Equals("KG", StringComparison.OrdinalIgnoreCase)
+                || line.Unit.Equals("G", StringComparison.OrdinalIgnoreCase)))
+        {
+            MessageBox.Show("Selecciona un producto vendido por peso en kg o g.", "Báscula",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        try
+        {
+            var kilograms = await _serialScale.ReadWeightAsync();
+            var quantity = line.Unit.Equals("G", StringComparison.OrdinalIgnoreCase) ? kilograms * 1000m : kilograms;
+            var product = _allProducts.FirstOrDefault(item => item.Id == line.ProductId);
+            if (product is not null && quantity > product.Stock)
+                throw new InvalidOperationException($"La báscula marcó {quantity:N3} {line.Unit}, pero solo hay {product.Stock:N3} {line.Unit} disponibles.");
+            line.Quantity = quantity;
+            RefreshTotals();
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show(exception.Message, "No se pudo leer la báscula", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     private void AddToCart(Product product)
@@ -249,6 +276,19 @@ public partial class MainWindow : Window
                 _currentSuspendedSaleId,
                 CustomerNameBox.Text,
                 CustomerDocumentBox.Text);
+            if (paymentDialog.Payments.Any(payment => payment.Method == "Efectivo"))
+            {
+                try
+                {
+                    var peripheralSettings = await PeripheralSettingsService.LoadAsync();
+                    if (!string.IsNullOrWhiteSpace(peripheralSettings.PrinterName))
+                        await new WindowsEscPosPeripheralService().OpenAsync();
+                }
+                catch (Exception drawerError)
+                {
+                    MessageBox.Show(drawerError.Message, "No se pudo abrir el cajón", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
             Cart.Clear();
             _currentSuspendedSaleId = null;
             CustomerNameBox.Clear();
@@ -260,7 +300,20 @@ public partial class MainWindow : Window
             {
                 var completedSale = await PosService.GetSaleAsync(saleId);
                 if (completedSale is not null)
-                    ReceiptPrintService.PrintSale(this, completedSale);
+                {
+                    try
+                    {
+                        var peripheralSettings = await PeripheralSettingsService.LoadAsync();
+                        if (string.IsNullOrWhiteSpace(peripheralSettings.PrinterName))
+                            ReceiptPrintService.PrintSale(this, completedSale);
+                        else
+                            await new WindowsEscPosPeripheralService().PrintSaleAsync(completedSale);
+                    }
+                    catch (Exception printError)
+                    {
+                        MessageBox.Show(printError.Message, "No se pudo imprimir el comprobante", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    }
+                }
             }
             await LoadReportsAsync();
             await RefreshAuditAsync();
@@ -612,12 +665,12 @@ public partial class MainWindow : Window
             sales = mergedSales.Values.OrderByDescending(sale => sale.CreatedAtUtc).ToList();
         }
 
-        var completed = sales.Where(sale => sale.Status == "Completada").ToList();
+        var completed = sales.Where(sale => sale.Status == "Completada" || sale.Status == "Devuelta parcialmente").ToList();
         var payments = completed.SelectMany(sale => sale.Payments).ToList();
         var summary = new SalesSummary(
-            completed.Count,
-            completed.Sum(sale => sale.Total),
-            payments.Where(payment => payment.Method == "Efectivo").Sum(payment => payment.Amount),
+            completed.Count(sale => sale.Total > sale.ReturnedTotal),
+            completed.Sum(sale => sale.Total - sale.ReturnedTotal),
+            payments.Where(payment => payment.Method == "Efectivo").Sum(payment => payment.Amount) - completed.Sum(sale => sale.ReturnedTotal),
             payments.Where(payment => payment.Method == "Tarjeta").Sum(payment => payment.Amount),
             payments.Where(payment => payment.Method is not ("Efectivo" or "Tarjeta")).Sum(payment => payment.Amount));
         TodayCountText.Text = summary.SaleCount.ToString("N0");
@@ -630,7 +683,7 @@ public partial class MainWindow : Window
             .Select(group =>
             {
                 var payments = group.SelectMany(sale => sale.Payments).ToList();
-                return new SalesByCashierRow(group.Key.CashierName, group.Count(), group.Sum(sale => sale.Total),
+                return new SalesByCashierRow(group.Key.CashierName, group.Count(), group.Sum(sale => sale.Total - sale.ReturnedTotal),
                     payments.Where(payment => payment.Method == "Efectivo").Sum(payment => payment.Amount),
                     payments.Where(payment => payment.Method != "Efectivo").Sum(payment => payment.Amount));
             })
@@ -638,7 +691,7 @@ public partial class MainWindow : Window
             .ToList();
         ShiftPerformanceGrid.ItemsSource = completed
             .GroupBy(sale => new { ShiftId = sale.CashShiftId ?? 0, sale.CashierName })
-            .Select(group => new SalesByShiftRow(group.Key.ShiftId, group.Key.CashierName, group.Count(), group.Sum(sale => sale.Total)))
+            .Select(group => new SalesByShiftRow(group.Key.ShiftId, group.Key.CashierName, group.Count(), group.Sum(sale => sale.Total - sale.ReturnedTotal)))
             .OrderByDescending(row => row.ShiftId)
             .ToList();
         var performance = serverSales is null
@@ -646,7 +699,7 @@ public partial class MainWindow : Window
             : completed.SelectMany(sale => sale.Items)
                 .GroupBy(item => new { item.ProductId, item.ProductName, item.Barcode })
                 .Select(group => new ProductPerformanceRow(group.Key.ProductName, group.Key.Barcode,
-                    group.Sum(item => item.Quantity), group.Sum(item => item.LineTotal)))
+                    group.Sum(item => item.Quantity - item.ReturnedQuantity), group.Sum(item => item.LineTotal - item.ReturnedAmount)))
                 .OrderByDescending(row => row.QuantitySold)
                 .ToList();
         ProductPerformanceGrid.ItemsSource = performance.Take(10).ToList();
@@ -865,8 +918,184 @@ public partial class MainWindow : Window
         if (RecentSalesGrid.SelectedItem is not Sale selected)
             return;
         var sale = await PosService.GetSaleAsync(selected.Id);
-        if (sale is not null)
+        if (sale is null)
+            return;
+        var settings = await PeripheralSettingsService.LoadAsync();
+        if (string.IsNullOrWhiteSpace(settings.PrinterName))
             ReceiptPrintService.PrintSale(this, sale);
+        else
+        {
+            try
+            {
+                await new WindowsEscPosPeripheralService().PrintSaleAsync(sale);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message, "No se pudo reimprimir", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+    }
+
+    private async void ReturnSale_Click(object sender, RoutedEventArgs e)
+    {
+        if (RecentSalesGrid.SelectedItem is not Sale selected
+            || selected.Status is not ("Completada" or "Devuelta parcialmente"))
+        {
+            MessageBox.Show("Selecciona una venta con productos pendientes de devolución.", "Devolución",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var sale = await PosService.GetSaleAsync(selected.Id);
+        if (sale is null)
+            return;
+        var dialog = new SaleReturnDialog(sale) { Owner = this };
+        if (dialog.ShowDialog() != true)
+            return;
+        var approval = await RequestSupervisorAsync($"Autorizar devolución de productos de la venta #{sale.Id} por aproximadamente {dialog.EstimatedTotal:C0}.");
+        if (approval is null)
+            return;
+        if (MessageBox.Show($"¿Confirmar la devolución de {dialog.EstimatedTotal:C0} de la venta #{sale.Id}?",
+                "Confirmar devolución", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
+            return;
+
+        try
+        {
+            var returned = await PosService.ReturnSaleItemsAsync(sale.Id, dialog.RequestedLines, approval, dialog.ReturnReason);
+            await ReloadProductsAsync();
+            await RefreshShiftPageAsync();
+            await LoadReportsAsync();
+            await RefreshAuditAsync();
+            MessageBox.Show($"Devolución #{returned.Id} registrada por {returned.Total:C0}. Se actualizó el inventario y la caja.",
+                "Devolución completada", MessageBoxButton.OK, MessageBoxImage.Information);
+            var fiscalDocuments = await PosService.GetFiscalDocumentsAsync(sale.Id);
+            if (fiscalDocuments.Any(document => document.Kind == "Factura" && document.Status == "Emitida")
+                && MessageBox.Show("La venta tiene factura electrónica. ¿Deseas emitir la nota crédito de esta devolución ahora?",
+                    "Nota crédito", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                await IssueCreditNoteAsync(sale.Id, returned.Id);
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show(exception.Message, "No se pudo completar la devolución", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private void ConfigureDevices_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new PeripheralSettingsDialog { Owner = this };
+        dialog.ShowDialog();
+    }
+
+    private async void IssueInvoice_Click(object sender, RoutedEventArgs e)
+    {
+        if (RecentSalesGrid.SelectedItem is not Sale selected)
+            return;
+        if (selected.Status is "Anulada" or "Devuelta")
+        {
+            MessageBox.Show("No se puede facturar una venta anulada o devuelta por completo.", "Factura electrónica",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        var documents = await PosService.GetFiscalDocumentsAsync(selected.Id);
+        var existing = documents.FirstOrDefault(document => document.Kind == "Factura" && document.Status == "Emitida");
+        if (existing is not null)
+        {
+            MessageBox.Show($"La venta ya tiene la factura {existing.DocumentNumber}.", "Factura electrónica",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        try
+        {
+            var issued = await FiscalInvoicingClient.IssueInvoiceAsync(selected.Id);
+            await PosService.SaveFiscalDocumentAsync(new FiscalDocument
+            {
+                SaleId = selected.Id,
+                Kind = "Factura",
+                Status = issued.Status,
+                Provider = issued.Provider,
+                DocumentNumber = issued.DocumentNumber,
+                ProviderDocumentId = issued.ProviderDocumentId,
+                ResponsePayload = issued.ResponsePayload
+            });
+            MessageBox.Show($"Factura electrónica emitida: {issued.DocumentNumber}.", "Factura electrónica",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (Exception exception)
+        {
+            await SaveFiscalFailureAsync(selected.Id, null, "Factura", exception.Message);
+            MessageBox.Show(exception.Message, "No se pudo emitir la factura", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private async void IssueCreditNote_Click(object sender, RoutedEventArgs e)
+    {
+        if (RecentSalesGrid.SelectedItem is not Sale selected)
+            return;
+        var returns = await PosService.GetSaleReturnsAsync(selected.Id);
+        if (returns.Count == 0)
+        {
+            MessageBox.Show("La venta todavía no tiene devoluciones registradas.", "Nota crédito",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        await IssueCreditNoteAsync(selected.Id, returns[0].Id);
+    }
+
+    private async Task IssueCreditNoteAsync(long saleId, long returnId)
+    {
+        var documents = await PosService.GetFiscalDocumentsAsync(saleId);
+        if (!documents.Any(document => document.Kind == "Factura" && document.Status == "Emitida"))
+        {
+            MessageBox.Show("Emite primero la factura electrónica original.", "Nota crédito",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        if (documents.Any(document => document.Kind == "Nota crédito" && document.SaleReturnId == returnId && document.Status == "Emitida"))
+        {
+            MessageBox.Show("Esta devolución ya tiene una nota crédito emitida.", "Nota crédito",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        try
+        {
+            var issued = await FiscalInvoicingClient.IssueCreditNoteAsync(saleId, returnId);
+            await PosService.SaveFiscalDocumentAsync(new FiscalDocument
+            {
+                SaleId = saleId,
+                SaleReturnId = returnId,
+                Kind = "Nota crédito",
+                Status = issued.Status,
+                Provider = issued.Provider,
+                DocumentNumber = issued.DocumentNumber,
+                ProviderDocumentId = issued.ProviderDocumentId,
+                ResponsePayload = issued.ResponsePayload
+            });
+            MessageBox.Show($"Nota crédito emitida: {issued.DocumentNumber}.", "Nota crédito",
+                MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (Exception exception)
+        {
+            await SaveFiscalFailureAsync(saleId, returnId, "Nota crédito", exception.Message);
+            MessageBox.Show(exception.Message, "No se pudo emitir la nota crédito", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private static async Task SaveFiscalFailureAsync(long saleId, long? returnId, string kind, string error)
+    {
+        try
+        {
+            await PosService.SaveFiscalDocumentAsync(new FiscalDocument
+            {
+                SaleId = saleId,
+                SaleReturnId = returnId,
+                Kind = kind,
+                Status = "Fallida",
+                Error = error
+            });
+        }
+        catch
+        {
+        }
     }
 
     private async void VoidSale_Click(object sender, RoutedEventArgs e)
@@ -876,20 +1105,32 @@ public partial class MainWindow : Window
             MessageBox.Show("Selecciona una venta completada del historial.", "Anular venta", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
-        var approval = await RequestSupervisorAsync($"La venta #{selected.Id} se devolverá en efectivo y se repondrán sus productos.");
+        var sale = await PosService.GetSaleAsync(selected.Id);
+        if (sale is null)
+            return;
+        var approval = await RequestSupervisorAsync($"Autorizar la devolución total de la venta #{sale.Id} y reponer sus productos.");
         if (approval is null)
             return;
-        if (MessageBox.Show($"¿Anular la venta #{selected.Id} por {selected.Total:C0}?",
+        if (MessageBox.Show($"¿Devolver todos los productos de la venta #{sale.Id} por {sale.Total:C0}?",
                 "Confirmar anulación", MessageBoxButton.YesNo, MessageBoxImage.Warning) != MessageBoxResult.Yes)
             return;
 
         try
         {
-            await PosService.VoidCompletedCashSaleAsync(selected.Id, approval);
+            var returned = await PosService.ReturnSaleItemsAsync(sale.Id,
+                sale.Items.Select(item => new SaleReturnLineDraft(item.Id, item.Quantity - item.ReturnedQuantity)).ToList(),
+                approval, "Anulación total de venta");
             await ReloadProductsAsync();
+            await RefreshShiftPageAsync();
             await LoadReportsAsync();
-            MessageBox.Show("La venta fue anulada y el inventario repuesto.", "Anulación completada",
+            await RefreshAuditAsync();
+            MessageBox.Show($"Devolución total registrada por {returned.Total:C0}; el inventario y la caja se actualizaron.", "Anulación completada",
                 MessageBoxButton.OK, MessageBoxImage.Information);
+            var documents = await PosService.GetFiscalDocumentsAsync(sale.Id);
+            if (documents.Any(document => document.Kind == "Factura" && document.Status == "Emitida")
+                && MessageBox.Show("La venta tiene factura electrónica. ¿Emitir la nota crédito de esta devolución?",
+                    "Nota crédito", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                await IssueCreditNoteAsync(sale.Id, returned.Id);
         }
         catch (Exception ex)
         {
