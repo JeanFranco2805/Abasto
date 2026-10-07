@@ -4,7 +4,7 @@
         Title="Cobrar venta"
         Width="650" Height="600" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-        Background="#11191E"
+        Background="#101722"
         FontFamily="Segoe UI">
   <Grid Margin="22">
     <Grid.RowDefinitions>
@@ -14,10 +14,10 @@
       <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
     <StackPanel>
-      <TextBlock Text="Cobro" FontSize="24" FontWeight="Bold" Foreground="#EEF2EF" />
-      <TextBlock x:Name="TotalText" FontSize="16" Foreground="#A1AEAB" Margin="0,4,0,14" />
+      <TextBlock Text="Cobro" FontSize="24" FontWeight="Bold" Foreground="#F1F4F8" />
+      <TextBlock x:Name="TotalText" FontSize="16" Foreground="#9AA9BB" Margin="0,4,0,14" />
     </StackPanel>
-    <Border Grid.Row="1" Background="#1A252A" CornerRadius="5" Padding="16" Margin="0,0,0,12">
+    <Border Grid.Row="1" Background="#1B2938" CornerRadius="5" Padding="16" Margin="0,0,0,12">
       <Grid>
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*" />
@@ -25,7 +25,7 @@
           <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <StackPanel Margin="0,0,12,0">
-          <TextBlock Text="Medio de pago" FontSize="12" FontWeight="SemiBold" Foreground="#A1AEAB" Margin="0,0,0,5" />
+          <TextBlock Text="Medio de pago" FontSize="12" FontWeight="SemiBold" Foreground="#9AA9BB" Margin="0,0,0,5" />
           <ComboBox x:Name="PaymentMethodBox" SelectedIndex="0">
             <ComboBoxItem Content="Efectivo" />
             <ComboBoxItem Content="Tarjeta" />
@@ -34,15 +34,15 @@
           </ComboBox>
         </StackPanel>
         <StackPanel Grid.Column="1" Margin="0,0,12,0">
-          <TextBlock Text="Recibido / valor" FontSize="12" FontWeight="SemiBold" Foreground="#A1AEAB" Margin="0,0,0,5" />
+          <TextBlock Text="Recibido / valor" FontSize="12" FontWeight="SemiBold" Foreground="#9AA9BB" Margin="0,0,0,5" />
           <TextBox x:Name="AmountBox" />
         </StackPanel>
-        <Button Grid.Column="2" Content="Agregar" VerticalAlignment="Bottom" Click="AddPayment_Click" Background="#253439" />
+        <Button Grid.Column="2" Content="Agregar" VerticalAlignment="Bottom" Click="AddPayment_Click" Background="#293A50" />
       </Grid>
     </Border>
     <DataGrid x:Name="PaymentGrid" Grid.Row="2" AutoGenerateColumns="False" IsReadOnly="True"
-              CanUserAddRows="False" HeadersVisibility="Column" Background="#1A252A"
-              BorderBrush="#303A3D" RowHeight="38" Margin="0,0,0,12">
+              CanUserAddRows="False" HeadersVisibility="Column" Background="#1B2938"
+              BorderBrush="#2E3D52" RowHeight="38" Margin="0,0,0,12">
       <DataGrid.Columns>
         <DataGridTextColumn Header="Medio" Binding="{Binding Method}" Width="*" />
         <DataGridTextColumn Header="Aplicado" Binding="{Binding Amount, StringFormat=C0}" Width="130" />
@@ -58,11 +58,11 @@
       </Grid.ColumnDefinitions>
       <StackPanel VerticalAlignment="Center">
         <TextBlock x:Name="RemainingText" FontSize="20" FontWeight="Bold" Foreground="#FFB4AB" />
-        <TextBlock Text="Pendiente de pago" FontSize="12" Foreground="#A1AEAB" />
+        <TextBlock Text="Pendiente de pago" FontSize="12" Foreground="#9AA9BB" />
       </StackPanel>
       <Button Grid.Column="1" Content="Cancelar" Click="Cancel_Click" Margin="0,0,10,0" />
       <Button x:Name="CompleteButton" Grid.Column="2" Content="Confirmar cobro" Click="Complete_Click"
-              Background="#36A995" Foreground="White" IsEnabled="False" />
+              Background="#2E6BC7" Foreground="White" IsEnabled="False" />
     </Grid>
   </Grid>
 </Window>
