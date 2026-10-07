@@ -4,7 +4,7 @@
         Title="Producto"
         Width="560" Height="620" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-        Background="#11191E"
+        Background="#101722"
         FontFamily="Segoe UI">
   <Grid Margin="22">
     <Grid.RowDefinitions>
@@ -13,10 +13,10 @@
       <RowDefinition Height="Auto" />
     </Grid.RowDefinitions>
     <StackPanel Margin="0,0,0,15">
-      <TextBlock x:Name="TitleText" Text="Producto" FontSize="24" FontWeight="Bold" Foreground="#EEF2EF" />
-      <TextBlock Text="Catálogo e inventario de la caja local" Foreground="#A1AEAB" Margin="0,4,0,0" />
+      <TextBlock x:Name="TitleText" Text="Producto" FontSize="24" FontWeight="Bold" Foreground="#F1F4F8" />
+      <TextBlock Text="Catálogo e inventario de la caja local" Foreground="#9AA9BB" Margin="0,4,0,0" />
     </StackPanel>
-    <Border Grid.Row="1" Background="#1A252A" CornerRadius="5" Padding="18">
+    <Border Grid.Row="1" Background="#1B2938" CornerRadius="5" Padding="18">
       <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel>
           <TextBlock Text="Código de barras" Style="{StaticResource FieldLabel}" />
@@ -58,7 +58,7 @@
     </Border>
     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
       <Button Content="Cancelar" Click="Cancel_Click" Margin="0,0,10,0" />
-      <Button Content="Guardar producto" Click="Save_Click" Background="#36A995" Foreground="White" />
+      <Button Content="Guardar producto" Click="Save_Click" Background="#2E6BC7" Foreground="White" />
     </StackPanel>
   </Grid>
 </Window>
