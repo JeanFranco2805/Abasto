@@ -83,11 +83,11 @@
                      FontSize="14" Foreground="#9AA9BB" TextWrapping="Wrap" Margin="0,7,0,27" />
 
           <TextBlock Text="Usuario" FontSize="13" FontWeight="SemiBold" Foreground="#CCD5E1" Margin="0,0,0,7" />
-          <TextBox x:Name="UsernameBox" Text="cajero" FontSize="15" Padding="13,11"
+          <TextBox x:Name="UsernameBox" Text="admin" FontSize="15" Padding="13,11"
                    BorderBrush="#3A4B63" Margin="0,0,0,18" />
 
           <TextBlock Text="PIN" FontSize="13" FontWeight="SemiBold" Foreground="#CCD5E1" Margin="0,0,0,7" />
-          <PasswordBox x:Name="PinBox" Padding="13,11" FontSize="16" MaxLength="12" Password="1111"
+          <PasswordBox x:Name="PinBox" Padding="13,11" FontSize="16" MaxLength="12"
                        BorderBrush="#3A4B63" />
 
           <TextBlock x:Name="ErrorText" Foreground="#FFB4AB" TextWrapping="Wrap" Margin="0,9,0,0"
@@ -99,27 +99,10 @@
 
         <Border Grid.Row="2" BorderBrush="#2E3D52" BorderThickness="0,1,0,0" Padding="0,14,0,0">
           <StackPanel>
-            <TextBlock Text="CUENTAS DE DEMOSTRACIÓN" FontSize="10" FontWeight="Bold" Foreground="#9AA9BB"
-                       Margin="0,0,0,9" />
-            <Grid>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-              </Grid.ColumnDefinitions>
-              <StackPanel>
-                <TextBlock Text="CAJERO" FontSize="9" FontWeight="SemiBold" Foreground="#8A99AE" />
-                <TextBlock Text="cajero · 1111" FontSize="11" FontWeight="SemiBold" Foreground="#CCD5E1" Margin="0,3,0,0" />
-              </StackPanel>
-              <StackPanel Grid.Column="1">
-                <TextBlock Text="SUPERVISOR" FontSize="9" FontWeight="SemiBold" Foreground="#8A99AE" />
-                <TextBlock Text="supervisor · 1234" FontSize="11" FontWeight="SemiBold" Foreground="#CCD5E1" Margin="0,3,0,0" />
-              </StackPanel>
-              <StackPanel Grid.Column="2">
-                <TextBlock Text="ADMIN" FontSize="9" FontWeight="SemiBold" Foreground="#8A99AE" />
-                <TextBlock Text="admin · 2468" FontSize="11" FontWeight="SemiBold" Foreground="#CCD5E1" Margin="0,3,0,0" />
-              </StackPanel>
-            </Grid>
+            <TextBlock Text="CUENTA ADMINISTRADORA INICIAL" FontSize="10" FontWeight="Bold" Foreground="#9AA9BB"
+                       Margin="0,0,0,5" />
+            <TextBlock Text="Usuario: admin · PIN inicial: 2468" FontSize="11" FontWeight="SemiBold"
+                       Foreground="#CCD5E1" />
           </StackPanel>
         </Border>
       </Grid>
