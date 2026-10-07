@@ -1,0 +1,77 @@
+<Window x:Class="Abasto.Dialogs.PeripheralSettingsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Equipos y facturación"
+        Width="700" Height="620" MinWidth="620" MinHeight="540"
+        WindowStartupLocation="CenterOwner"
+        Background="#101722"
+        FontFamily="Segoe UI">
+  <Grid Margin="22">
+    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+    <StackPanel Margin="0,0,0,14">
+      <TextBlock Text="Equipos y facturación" FontSize="23" FontWeight="Bold" Foreground="#F1F4F8" />
+      <TextBlock Text="Conecta la impresora térmica, el cajón y la báscula de esta caja." Foreground="#9AA9BB" Margin="0,4,0,0" />
+    </StackPanel>
+    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+      <StackPanel>
+        <Border Background="#1B2938" CornerRadius="5" Padding="18" Margin="0,0,0,12">
+          <StackPanel>
+            <TextBlock Text="Impresora y cajón portamonedas" FontSize="16" FontWeight="Bold" Foreground="#F1F4F8" />
+            <TextBlock Text="Usa una impresora ESC/POS instalada en Windows. El cajón se abre mediante el puerto de la impresora." Foreground="#9AA9BB" TextWrapping="Wrap" Margin="0,4,0,12" />
+            <TextBlock Text="Nombre comercial de la tienda" Style="{StaticResource FieldLabel}" />
+            <TextBox x:Name="StoreNameBox" MinHeight="38" Margin="0,0,0,10" />
+            <TextBlock Text="Nombre de impresora en Windows" Style="{StaticResource FieldLabel}" />
+            <TextBox x:Name="PrinterNameBox" MinHeight="38" />
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+              <Button Content="Guardar equipo" Click="Save_Click" Margin="0,0,8,0" />
+              <Button Content="Imprimir prueba" Click="PrintTest_Click" Margin="0,0,8,0" />
+              <Button Content="Probar cajón" Click="OpenDrawer_Click" />
+            </StackPanel>
+            <TextBlock x:Name="PrinterStatusText" Foreground="#9AA9BB" TextWrapping="Wrap" Margin="0,8,0,0" />
+          </StackPanel>
+        </Border>
+        <Border Background="#1B2938" CornerRadius="5" Padding="18" Margin="0,0,0,12">
+          <StackPanel>
+            <TextBlock Text="Báscula serial" FontSize="16" FontWeight="Bold" Foreground="#F1F4F8" />
+            <TextBlock Text="Configura una báscula que envíe el peso como texto por puerto COM. Los gramos y libras se convierten a kilogramos." Foreground="#9AA9BB" TextWrapping="Wrap" Margin="0,4,0,12" />
+            <Grid>
+              <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+              <StackPanel Margin="0,0,10,0">
+                <TextBlock Text="Puerto COM" Style="{StaticResource FieldLabel}" />
+                <TextBox x:Name="ScalePortBox" MinHeight="38" ToolTip="Ejemplo: COM3" />
+              </StackPanel>
+              <StackPanel Grid.Column="1">
+                <TextBlock Text="Velocidad (baudios)" Style="{StaticResource FieldLabel}" />
+                <TextBox x:Name="ScaleBaudBox" MinHeight="38" Text="9600" />
+              </StackPanel>
+            </Grid>
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+              <Button Content="Leer peso" Click="ReadScale_Click" />
+              <TextBlock x:Name="ScaleStatusText" Foreground="#9AA9BB" VerticalAlignment="Center" Margin="12,0,0,0" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+        <Border Background="#1B2938" CornerRadius="5" Padding="18" Margin="0,0,0,12">
+          <StackPanel>
+            <TextBlock Text="Lector y datáfono" FontSize="16" FontWeight="Bold" Foreground="#F1F4F8" />
+            <TextBlock Text="Los lectores USB tipo teclado ya escriben el código en la caja. El datáfono requiere un conector del fabricante para cobrar y reembolsar de forma verificable." Foreground="#9AA9BB" TextWrapping="Wrap" Margin="0,4,0,0" />
+            <TextBlock Text="Conexión de datáfono: pendiente de configurar un adaptador del modelo usado por la tienda." x:Name="PaymentTerminalStatusText" Foreground="#FFD18B" TextWrapping="Wrap" Margin="0,8,0,0" />
+            <TextBlock Text="Pantalla de cliente: requiere un modelo o monitor secundario definido para mostrar la venta actual." Foreground="#9AA9BB" TextWrapping="Wrap" Margin="0,6,0,0" />
+          </StackPanel>
+        </Border>
+        <Border Background="#1B2938" CornerRadius="5" Padding="18">
+          <StackPanel>
+            <TextBlock Text="Facturación electrónica y notas crédito" FontSize="16" FontWeight="Bold" Foreground="#F1F4F8" />
+            <TextBlock Text="El proveedor se conecta desde el backend por HTTPS. La clave del proveedor permanece en el servidor." Foreground="#9AA9BB" TextWrapping="Wrap" Margin="0,4,0,10" />
+            <Button Content="Comprobar proveedor fiscal" Click="CheckFiscalProvider_Click" HorizontalAlignment="Left" />
+            <TextBlock x:Name="FiscalProviderStatusText" Foreground="#9AA9BB" TextWrapping="Wrap" Margin="0,8,0,0" />
+            <TextBlock Text="Configura ElectronicInvoicing__ProviderName, ElectronicInvoicing__BaseUrl y ElectronicInvoicing__AccessToken en el equipo del backend." Foreground="#8FB4EA" TextWrapping="Wrap" Margin="0,8,0,0" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+      <Button Content="Cerrar" Click="Close_Click" />
+    </StackPanel>
+  </Grid>
+</Window>
