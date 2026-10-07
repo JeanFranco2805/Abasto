@@ -1,9 +1,9 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using SupermercadoPOS.Domain;
+using Abasto.Domain;
 
-namespace SupermercadoPOS.Services;
+namespace Abasto.Services;
 
 public static class ReceiptPrintService
 {
@@ -30,7 +30,7 @@ public static class ReceiptPrintService
             ColumnWidth = 280,
             ColumnGap = 0
         };
-        document.Blocks.Add(MakeParagraph("SUPERMERCADO", true, TextAlignment.Center));
+        document.Blocks.Add(MakeParagraph("ABASTO", true, TextAlignment.Center));
         document.Blocks.Add(MakeParagraph("COMPROBANTE DE VENTA", false, TextAlignment.Center));
         document.Blocks.Add(MakeParagraph($"Venta #{sale.Id}  {sale.CreatedAtUtc.ToLocalTime():dd/MM/yyyy HH:mm}", false));
         document.Blocks.Add(MakeParagraph($"Cajero: {sale.CashierName}", false));
