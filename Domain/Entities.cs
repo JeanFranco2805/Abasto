@@ -7,6 +7,7 @@ public sealed class Product
     public string Name { get; set; } = "";
     public string Category { get; set; } = "";
     public string Unit { get; set; } = "UND";
+    public string ImagePath { get; set; } = "";
     public decimal UnitPrice { get; set; }
     public decimal TaxRate { get; set; } = 0.19m;
     public decimal Stock { get; set; }
