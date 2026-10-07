@@ -55,11 +55,27 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.PropertyNameCaseInsensitive = true);
 
 var app = builder.Build();
+var demoBarcodes = new[]
+{
+    "7701001000011", "7701001000012", "7701001000013", "7701001000014",
+    "7701001000015", "7701001000016", "7701001000017", "7701001000018"
+};
 
 await using (var scope = app.Services.CreateAsyncScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<CentralDbContext>();
     await db.Database.EnsureCreatedAsync();
+    var demoProducts = await db.Products.Where(product => demoBarcodes.Contains(product.Barcode)).ToListAsync();
+    foreach (var product in demoProducts)
+    {
+        var localProductId = product.LocalProductId.ToString();
+        var demoEvents = await db.SyncEvents.Where(item => item.ClientId == product.ClientId
+            && item.EntityType == "Product" && item.EntityId == localProductId).ToListAsync();
+        db.SyncEvents.RemoveRange(demoEvents);
+    }
+    db.Products.RemoveRange(demoProducts);
+    if (demoProducts.Count > 0)
+        await db.SaveChangesAsync();
 }
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok", service = "SupermercadoPOS.Backend", utc = DateTime.UtcNow }));
@@ -165,13 +181,18 @@ app.MapGet("/api/products", async (HttpRequest request, IConfiguration configura
     return Results.Ok(await query.OrderBy(item => item.Name).ToListAsync());
 });
 
-app.MapGet("/api/sales", async (HttpRequest request, IConfiguration configuration, CentralDbContext db, string? clientId, int? take) =>
+app.MapGet("/api/sales", async (HttpRequest request, IConfiguration configuration, CentralDbContext db,
+    string? clientId, DateTime? fromUtc, DateTime? toUtc, int? take) =>
 {
     if (!IsAuthorized(request, configuration))
         return Results.Unauthorized();
     var query = db.Sales.AsNoTracking();
     if (!string.IsNullOrWhiteSpace(clientId))
         query = query.Where(item => item.ClientId == clientId);
+    if (fromUtc.HasValue)
+        query = query.Where(item => item.CreatedAtUtc >= fromUtc.Value);
+    if (toUtc.HasValue)
+        query = query.Where(item => item.CreatedAtUtc < toUtc.Value);
     return Results.Ok(await query.OrderByDescending(item => item.CreatedAtUtc)
         .Take(Math.Clamp(take ?? 100, 1, 500)).ToListAsync());
 });
@@ -201,8 +222,14 @@ static async Task ProjectEventAsync(CentralDbContext db, CentralSyncEvent syncEv
         var barcode = ReadString(root, "barcode");
         if (string.IsNullOrWhiteSpace(barcode))
             return;
-
-        var product = db.Products.Local.FirstOrDefault(item =>
+        var localProductId = ReadInt(root, "id");
+        var product = localProductId is > 0
+            ? db.Products.Local.FirstOrDefault(item => item.ClientId == syncEvent.ClientId
+                && item.LocalProductId == localProductId.Value)
+                ?? await db.Products.FirstOrDefaultAsync(item => item.ClientId == syncEvent.ClientId
+                    && item.LocalProductId == localProductId.Value)
+            : null;
+        product ??= db.Products.Local.FirstOrDefault(item =>
             item.ClientId == syncEvent.ClientId && item.Barcode == barcode)
             ?? await db.Products.FirstOrDefaultAsync(item =>
                 item.ClientId == syncEvent.ClientId && item.Barcode == barcode);
@@ -257,7 +284,9 @@ static async Task ProjectEventAsync(CentralDbContext db, CentralSyncEvent syncEv
     sale.DiscountTotal = ReadDecimal(saleRoot, "discountTotal") ?? sale.DiscountTotal;
     sale.TaxTotal = ReadDecimal(saleRoot, "taxTotal") ?? sale.TaxTotal;
     sale.Total = ReadDecimal(saleRoot, "total") ?? sale.Total;
-    sale.Payload = syncEvent.Payload;
+    if (syncEvent.Operation.Equals("SaleCompleted", StringComparison.OrdinalIgnoreCase)
+        || syncEvent.Operation.Equals("SaleVoided", StringComparison.OrdinalIgnoreCase))
+        sale.Payload = syncEvent.Payload;
 }
 
 static string? ReadString(JsonElement element, string name) =>
