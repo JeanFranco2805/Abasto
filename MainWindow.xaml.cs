@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using SupermercadoPOS.Dialogs;
 using SupermercadoPOS.Domain;
 using SupermercadoPOS.Services;
@@ -18,6 +19,7 @@ public partial class MainWindow : Window
     private bool _suppressInventoryFilterEvents;
     private CashShift? _openShift;
     private long? _currentSuspendedSaleId;
+    private readonly DispatcherTimer _syncTimer = new() { Interval = TimeSpan.FromSeconds(45) };
 
     public ObservableCollection<Product> DisplayProducts { get; } = [];
     public ObservableCollection<InventoryProductCard> InventoryProducts { get; } = [];
@@ -31,6 +33,8 @@ public partial class MainWindow : Window
         UserNameText.Text = Session.CurrentUser?.DisplayName ?? "Usuario";
         UserRoleText.Text = Session.CurrentUser?.Role ?? "";
         UsersTab.Visibility = Session.CurrentUser?.Role == "Administrador" ? Visibility.Visible : Visibility.Collapsed;
+        _syncTimer.Tick += async (_, _) => await SynchronizeAndRefreshAsync();
+        Closed += (_, _) => _syncTimer.Stop();
         Loaded += async (_, _) =>
         {
             ReportFromDate.SelectedDate = DateTime.Today;
@@ -40,6 +44,9 @@ public partial class MainWindow : Window
             RefreshTotals();
             await RefreshShiftPageAsync();
             MainTabs.SelectedItem = SalesTab;
+            await LoadBackendSettingsAsync();
+            await SynchronizeAndRefreshAsync();
+            _syncTimer.Start();
         };
         Cart.CollectionChanged += (_, _) => RefreshTotals();
     }
@@ -649,6 +656,60 @@ public partial class MainWindow : Window
         LatestBackupText.Text = latestBackup is null
             ? "No disponible"
             : latestBackup.LastWriteTime.ToString("dd/MM/yyyy HH:mm");
+    }
+
+    private async Task LoadBackendSettingsAsync()
+    {
+        var settings = await BackendSettingsService.LoadAsync();
+        BackendUrlBox.Text = settings.BaseUrl;
+        BackendApiKeyBox.Password = settings.ApiKey;
+    }
+
+    private async Task SynchronizeAndRefreshAsync()
+    {
+        var result = await BackendSyncService.SynchronizePendingAsync();
+        SyncStatusText.Text = result.Message;
+        BackendConnectionText.Text = result.IsConnected
+            ? $"API central conectada · Identificador de esta caja: {(await BackendSettingsService.LoadAsync()).ClientId[..8]}"
+            : result.Message;
+        await RefreshConnectivityAsync();
+    }
+
+    private async void SaveBackendSettings_Click(object sender, RoutedEventArgs e)
+    {
+        var url = BackendUrlBox.Text.Trim();
+        if (!string.IsNullOrEmpty(url)
+            && (!Uri.TryCreate(url, UriKind.Absolute, out var parsed)
+                || parsed.Scheme is not ("http" or "https")))
+        {
+            MessageBox.Show("Ingresa una URL completa que empiece por http:// o https://.",
+                "Conexión central", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        try
+        {
+            await BackendSettingsService.SaveAsync(url, BackendApiKeyBox.Password);
+            BackendConnectionText.Text = "Conexión guardada. Comprobando la API central…";
+            await SynchronizeAndRefreshAsync();
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show(exception.Message, "No se pudo guardar la conexión", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private async void SyncNow_Click(object sender, RoutedEventArgs e)
+    {
+        SyncNowButton.IsEnabled = false;
+        try
+        {
+            await SynchronizeAndRefreshAsync();
+        }
+        finally
+        {
+            SyncNowButton.IsEnabled = true;
+        }
     }
 
     private async void RefreshReport_Click(object sender, RoutedEventArgs e) => await LoadReportsAsync();
