@@ -1,4 +1,4 @@
-namespace SupermercadoPOS.Domain;
+namespace Abasto.Domain;
 
 public sealed record SaleLineDraft(
     int ProductId,
