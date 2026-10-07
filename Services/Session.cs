@@ -1,6 +1,6 @@
-using SupermercadoPOS.Domain;
+using Abasto.Domain;
 
-namespace SupermercadoPOS.Services;
+namespace Abasto.Services;
 
 public static class Session
 {
