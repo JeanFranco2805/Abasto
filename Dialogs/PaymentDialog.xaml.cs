@@ -2,9 +2,9 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using SupermercadoPOS.Domain;
+using Abasto.Domain;
 
-namespace SupermercadoPOS.Dialogs;
+namespace Abasto.Dialogs;
 
 public partial class PaymentDialog : Window
 {
