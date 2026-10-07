@@ -1,0 +1,44 @@
+<Window x:Class="Abasto.Dialogs.SaleReturnDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Devolución de productos"
+        Width="900" Height="640" MinWidth="760" MinHeight="520"
+        WindowStartupLocation="CenterOwner"
+        Background="#101722"
+        FontFamily="Segoe UI">
+  <Grid Margin="22">
+    <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+    <StackPanel Margin="0,0,0,14">
+      <TextBlock Text="Devolución de productos" FontSize="23" FontWeight="Bold" Foreground="#F1F4F8" />
+      <TextBlock x:Name="SaleSummaryText" Foreground="#9AA9BB" Margin="0,4,0,0" />
+      <TextBlock Text="Indica la cantidad que regresa por cada producto. El reembolso se limita al efectivo recibido en la venta." Foreground="#9AA9BB" TextWrapping="Wrap" Margin="0,6,0,0" />
+    </StackPanel>
+    <DataGrid x:Name="ReturnItemsGrid" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False"
+              HeadersVisibility="Column" RowHeight="42" SelectionMode="Single" CellEditEnding="ReturnItemsGrid_CellEditEnding">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="Producto" Binding="{Binding ProductName}" Width="*" IsReadOnly="True" />
+        <DataGridTextColumn Header="Unidad" Binding="{Binding Unit}" Width="80" IsReadOnly="True" />
+        <DataGridTextColumn Header="Vendida" Binding="{Binding SoldQuantity, StringFormat=N3}" Width="95" IsReadOnly="True" />
+        <DataGridTextColumn Header="Devuelta" Binding="{Binding ReturnedQuantity, StringFormat=N3}" Width="95" IsReadOnly="True" />
+        <DataGridTextColumn Header="Disponible" Binding="{Binding AvailableQuantity, StringFormat=N3}" Width="100" IsReadOnly="True" />
+        <DataGridTextColumn Header="A devolver" Binding="{Binding QuantityToReturn, UpdateSourceTrigger=PropertyChanged, StringFormat=N3}" Width="115" />
+        <DataGridTextColumn Header="Reembolso" Binding="{Binding ReturnValue, StringFormat=C0}" Width="120" IsReadOnly="True" />
+      </DataGrid.Columns>
+    </DataGrid>
+    <Grid Grid.Row="2" Margin="0,14,0,0">
+      <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+      <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+      <StackPanel Grid.ColumnSpan="2">
+        <TextBlock Text="Motivo de la devolución" Style="{StaticResource FieldLabel}" />
+        <TextBox x:Name="ReasonBox" MinHeight="38" MaxLength="240" />
+      </StackPanel>
+      <TextBlock x:Name="ErrorText" Grid.Row="1" Foreground="#FFB4AB" TextWrapping="Wrap" VerticalAlignment="Center" Margin="0,12,12,0" />
+      <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,12,0,0">
+        <TextBlock Text="Total a devolver" Foreground="#9AA9BB" VerticalAlignment="Center" Margin="0,0,8,0" />
+        <TextBlock x:Name="ReturnTotalText" Foreground="#8FB4EA" FontSize="20" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,18,0" />
+        <Button Content="Cancelar" Click="Cancel_Click" Margin="0,0,8,0" />
+        <Button Content="Continuar" Click="Continue_Click" Background="#2E6BC7" Foreground="White" />
+      </StackPanel>
+    </Grid>
+  </Grid>
+</Window>
