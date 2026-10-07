@@ -10,6 +10,10 @@ public sealed class PosDbContext(DbContextOptions<PosDbContext> options) : DbCon
     public DbSet<Sale> Sales => Set<Sale>();
     public DbSet<SaleItem> SaleItems => Set<SaleItem>();
     public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<SaleReturn> SaleReturns => Set<SaleReturn>();
+    public DbSet<SaleReturnItem> SaleReturnItems => Set<SaleReturnItem>();
+    public DbSet<SaleReturnPayment> SaleReturnPayments => Set<SaleReturnPayment>();
+    public DbSet<FiscalDocument> FiscalDocuments => Set<FiscalDocument>();
     public DbSet<CashShift> CashShifts => Set<CashShift>();
     public DbSet<CashMovement> CashMovements => Set<CashMovement>();
     public DbSet<AuditEvent> AuditEvents => Set<AuditEvent>();
@@ -29,6 +33,11 @@ public sealed class PosDbContext(DbContextOptions<PosDbContext> options) : DbCon
         modelBuilder.Entity<PosUser>().HasIndex(u => u.Username).IsUnique();
         modelBuilder.Entity<Sale>().HasMany(s => s.Items).WithOne(i => i.Sale).HasForeignKey(i => i.SaleId);
         modelBuilder.Entity<Sale>().HasMany(s => s.Payments).WithOne(p => p.Sale).HasForeignKey(p => p.SaleId);
+        modelBuilder.Entity<Sale>().HasMany(s => s.Returns).WithOne(r => r.Sale).HasForeignKey(r => r.SaleId);
+        modelBuilder.Entity<SaleReturn>().HasMany(r => r.Items).WithOne(i => i.SaleReturn).HasForeignKey(i => i.SaleReturnId);
+        modelBuilder.Entity<SaleReturn>().HasMany(r => r.Payments).WithOne(p => p.SaleReturn).HasForeignKey(p => p.SaleReturnId);
+        modelBuilder.Entity<SaleReturn>().HasIndex(r => new { r.SaleId, r.CreatedAtUtc });
+        modelBuilder.Entity<FiscalDocument>().HasIndex(d => new { d.SaleId, d.Kind, d.Status });
         modelBuilder.Entity<CashShift>().HasIndex(s => new { s.CashierId, s.Status });
         modelBuilder.Entity<SyncQueueItem>().HasIndex(q => new { q.Status, q.CreatedAtUtc });
 
@@ -43,5 +52,12 @@ public sealed class PosDbContext(DbContextOptions<PosDbContext> options) : DbCon
         modelBuilder.Entity<SaleItem>().Property(i => i.Quantity).HasPrecision(18, 3);
         modelBuilder.Entity<SaleItem>().Property(i => i.UnitPrice).HasPrecision(18, 2);
         modelBuilder.Entity<Payment>().Property(p => p.Amount).HasPrecision(18, 2);
+        modelBuilder.Entity<Sale>().Property(s => s.ReturnedTotal).HasPrecision(18, 2);
+        modelBuilder.Entity<SaleItem>().Property(i => i.ReturnedQuantity).HasPrecision(18, 3);
+        modelBuilder.Entity<SaleItem>().Property(i => i.ReturnedAmount).HasPrecision(18, 2);
+        modelBuilder.Entity<SaleReturn>().Property(r => r.Total).HasPrecision(18, 2);
+        modelBuilder.Entity<SaleReturnItem>().Property(i => i.Quantity).HasPrecision(18, 3);
+        modelBuilder.Entity<SaleReturnItem>().Property(i => i.Amount).HasPrecision(18, 2);
+        modelBuilder.Entity<SaleReturnPayment>().Property(p => p.Amount).HasPrecision(18, 2);
     }
 }
