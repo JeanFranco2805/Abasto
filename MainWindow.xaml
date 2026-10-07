@@ -4,14 +4,14 @@
         Title="Supermercado POS"
         Width="1280" Height="800" MinWidth="1024" MinHeight="650" WindowState="Maximized"
         WindowStartupLocation="CenterScreen"
-        Background="#11191E"
+        Background="#101722"
         FontFamily="Segoe UI" xml:lang="es-CO" PreviewKeyDown="MainWindow_PreviewKeyDown">
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="72" />
       <RowDefinition Height="*" />
     </Grid.RowDefinitions>
-    <Border Background="#17282D" Padding="24,0">
+    <Border Background="#17263A" Padding="24,0">
       <Grid>
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="*" />
@@ -26,21 +26,21 @@
           </Border>
           <StackPanel VerticalAlignment="Center">
             <TextBlock Text="SUPERMERCADO POS" Foreground="White" FontSize="16" FontWeight="Bold" />
-            <TextBlock Text="Punto de venta local" Foreground="#AFBCB9" FontSize="12" Margin="0,2,0,0" />
+            <TextBlock Text="Punto de venta local" Foreground="#B1BDCB" FontSize="12" Margin="0,2,0,0" />
           </StackPanel>
         </StackPanel>
-        <Border Grid.Column="1" Background="#243B3C" CornerRadius="16" Padding="12,7" VerticalAlignment="Center" Margin="0,0,18,0">
+        <Border Grid.Column="1" Background="#263D59" CornerRadius="16" Padding="12,7" VerticalAlignment="Center" Margin="0,0,18,0">
           <StackPanel Orientation="Horizontal">
-            <Ellipse Width="8" Height="8" Fill="#32D583" VerticalAlignment="Center" Margin="0,0,7,0" />
+            <Ellipse Width="8" Height="8" Fill="#80A8E0" VerticalAlignment="Center" Margin="0,0,7,0" />
             <TextBlock Text="Base local disponible" Foreground="White" FontSize="12" FontWeight="SemiBold" />
           </StackPanel>
         </Border>
         <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="0,0,18,0">
           <TextBlock x:Name="UserNameText" Foreground="White" FontWeight="SemiBold" HorizontalAlignment="Right" />
-          <TextBlock x:Name="UserRoleText" Foreground="#AFBCB9" FontSize="12" HorizontalAlignment="Right" />
+          <TextBlock x:Name="UserRoleText" Foreground="#B1BDCB" FontSize="12" HorizontalAlignment="Right" />
         </StackPanel>
         <Button x:Name="ShiftButton" Grid.Column="3" Content="Abrir turno" Click="Shift_Click"
-                Background="#36A995" Foreground="White" BorderBrush="#36A995" VerticalAlignment="Center" />
+                Background="#2E6BC7" Foreground="White" BorderBrush="#2E6BC7" VerticalAlignment="Center" />
       </Grid>
     </Border>
 
@@ -55,7 +55,7 @@
             <ColumnDefinition Width="1.1*" />
           </Grid.ColumnDefinitions>
 
-          <Border Background="#1A252A" CornerRadius="5" Padding="18" Margin="0,0,12,0">
+          <Border Background="#1B2938" CornerRadius="5" Padding="18" Margin="0,0,12,0">
             <Grid>
               <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -65,17 +65,17 @@
               </Grid.RowDefinitions>
               <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <StackPanel>
-                  <TextBlock Text="Productos" FontSize="21" FontWeight="Bold" Foreground="#EEF2EF" />
-                  <TextBlock Text="Busca por nombre o escanea el código." FontSize="12" Foreground="#A1AEAB" Margin="0,3,0,0" />
+                  <TextBlock Text="Productos" FontSize="21" FontWeight="Bold" Foreground="#F1F4F8" />
+                  <TextBlock Text="Busca por nombre o escanea el código." FontSize="12" Foreground="#9AA9BB" Margin="0,3,0,0" />
                 </StackPanel>
                 <TextBlock x:Name="ProductCountText" HorizontalAlignment="Right" VerticalAlignment="Center"
-                           Foreground="#A1AEAB" Margin="24,0,0,0" />
+                           Foreground="#9AA9BB" Margin="24,0,0,0" />
               </StackPanel>
               <Grid Grid.Row="1" Margin="0,15,0,10">
                 <TextBox x:Name="SearchBox" ToolTip="Buscar por nombre, categoría o código de barras"
                          TextChanged="Search_TextChanged" />
                 <TextBlock Text="Buscar producto por nombre, categoría o código de barras"
-                           Foreground="#909E9B" Margin="12,0,8,0" VerticalAlignment="Center"
+                           Foreground="#8A99AE" Margin="12,0,8,0" VerticalAlignment="Center"
                            IsHitTestVisible="False">
                   <TextBlock.Style>
                     <Style TargetType="TextBlock">
@@ -95,7 +95,7 @@
                   <TextBox x:Name="BarcodeBox" ToolTip="Escanea o escribe el código de barras"
                            KeyDown="Barcode_KeyDown" />
                   <TextBlock Text="Escanear o escribir código de barras y pulsar Enter"
-                             Foreground="#909E9B" Margin="12,0,8,0" VerticalAlignment="Center"
+                             Foreground="#8A99AE" Margin="12,0,8,0" VerticalAlignment="Center"
                              IsHitTestVisible="False">
                     <TextBlock.Style>
                       <Style TargetType="TextBlock">
@@ -110,7 +110,7 @@
                   </TextBlock>
                 </Grid>
                 <Button Grid.Column="1" Content="Agregar código" Click="BarcodeAdd_Click"
-                        Background="#253439" Margin="8,0,0,0" />
+                        Background="#293A50" Margin="8,0,0,0" />
               </Grid>
               <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
                 <ItemsControl x:Name="ProductsPanel">
@@ -119,31 +119,31 @@
                   </ItemsControl.ItemsPanel>
                   <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                      <Button Width="220" Height="140" Margin="0,0,12,12" Padding="0" Background="#1A252A"
-                              BorderBrush="#303A3D" BorderThickness="1" HorizontalContentAlignment="Stretch"
+                      <Button Width="220" Height="140" Margin="0,0,12,12" Padding="0" Background="#1B2938"
+                              BorderBrush="#2E3D52" BorderThickness="1" HorizontalContentAlignment="Stretch"
                               VerticalContentAlignment="Stretch" Tag="{Binding}" Click="Product_Click">
                         <Border Padding="14" CornerRadius="5">
                           <Grid>
                             <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
                             <Grid>
                               <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                              <Border Background="#25383A" CornerRadius="5" Padding="7,3" HorizontalAlignment="Left">
-                                <TextBlock Text="{Binding Category}" FontSize="10" FontWeight="SemiBold" Foreground="#71CABB" />
+                              <Border Background="#293F5C" CornerRadius="5" Padding="7,3" HorizontalAlignment="Left">
+                                <TextBlock Text="{Binding Category}" FontSize="10" FontWeight="SemiBold" Foreground="#8FB4EA" />
                               </Border>
-                              <Border Grid.Column="1" Background="#202B2F" CornerRadius="5" Padding="7,3">
-                                <TextBlock Text="{Binding Unit}" FontSize="10" FontWeight="Bold" Foreground="#B8C4C0" />
+                              <Border Grid.Column="1" Background="#24354A" CornerRadius="5" Padding="7,3">
+                                <TextBlock Text="{Binding Unit}" FontSize="10" FontWeight="Bold" Foreground="#BBC7D4" />
                               </Border>
                             </Grid>
                             <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,8,0,5">
-                              <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold" Foreground="#EEF2EF"
+                              <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold" Foreground="#F1F4F8"
                                          TextWrapping="Wrap" MaxHeight="40" />
-                              <TextBlock Text="{Binding Barcode}" FontSize="10" Foreground="#909E9B" Margin="0,4,0,0" />
+                              <TextBlock Text="{Binding Barcode}" FontSize="10" Foreground="#8A99AE" Margin="0,4,0,0" />
                             </StackPanel>
                             <Grid Grid.Row="2">
                               <TextBlock Text="{Binding Stock, StringFormat='Existencias: {0:N2}'}" FontSize="10"
-                                         Foreground="#A1AEAB" VerticalAlignment="Center" />
+                                         Foreground="#9AA9BB" VerticalAlignment="Center" />
                               <TextBlock Text="{Binding UnitPrice, StringFormat=C0}" FontSize="16"
-                                         FontWeight="Bold" Foreground="#71CABB" HorizontalAlignment="Right" />
+                                         FontWeight="Bold" Foreground="#8FB4EA" HorizontalAlignment="Right" />
                             </Grid>
                           </Grid>
                         </Border>
@@ -155,7 +155,7 @@
             </Grid>
           </Border>
 
-          <Border Grid.Column="1" Background="#1A252A" CornerRadius="5" Padding="18">
+          <Border Grid.Column="1" Background="#1B2938" CornerRadius="5" Padding="18">
             <Grid>
               <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -166,20 +166,20 @@
               <Grid Margin="0,0,0,12">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                 <StackPanel>
-                  <TextBlock Text="Venta actual" FontSize="21" FontWeight="Bold" Foreground="#EEF2EF" />
-                  <TextBlock x:Name="CartCountText" Text="Venta vacía · lista para empezar" FontSize="12" Foreground="#A1AEAB" Margin="0,3,0,0" />
+                  <TextBlock Text="Venta actual" FontSize="21" FontWeight="Bold" Foreground="#F1F4F8" />
+                  <TextBlock x:Name="CartCountText" Text="Venta vacía · lista para empezar" FontSize="12" Foreground="#9AA9BB" Margin="0,3,0,0" />
                 </StackPanel>
                 <Button Grid.Column="1" Content="Vaciar" Click="ClearCart_Click" Padding="10,6" />
               </Grid>
-              <Border Grid.Row="1" Background="#1F2B30" CornerRadius="5" Padding="10" Margin="0,0,0,10">
+              <Border Grid.Row="1" Background="#202F40" CornerRadius="5" Padding="10" Margin="0,0,0,10">
                 <Grid>
                   <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="10" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
                   <StackPanel>
-                    <TextBlock Text="CLIENTE (OPCIONAL)" FontSize="10" FontWeight="Bold" Foreground="#A1AEAB" Margin="0,0,0,4" />
+                    <TextBlock Text="CLIENTE (OPCIONAL)" FontSize="10" FontWeight="Bold" Foreground="#9AA9BB" Margin="0,0,0,4" />
                     <TextBox x:Name="CustomerNameBox" FontSize="12" Padding="7,5" ToolTip="Nombre del cliente para el comprobante" />
                   </StackPanel>
                   <StackPanel Grid.Column="2">
-                    <TextBlock Text="DOCUMENTO" FontSize="10" FontWeight="Bold" Foreground="#A1AEAB" Margin="0,0,0,4" />
+                    <TextBlock Text="DOCUMENTO" FontSize="10" FontWeight="Bold" Foreground="#9AA9BB" Margin="0,0,0,4" />
                     <TextBox x:Name="CustomerDocumentBox" FontSize="12" Padding="7,5" ToolTip="Documento del cliente" />
                   </StackPanel>
                 </Grid>
@@ -189,7 +189,7 @@
                          Background="Transparent" ScrollViewer.VerticalScrollBarVisibility="Auto">
                   <ListBox.ItemTemplate>
                     <DataTemplate>
-                      <Border BorderBrush="#303A3D" BorderThickness="0,0,0,1" Padding="0,10">
+                      <Border BorderBrush="#2E3D52" BorderThickness="0,0,0,1" Padding="0,10">
                         <Grid>
                           <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -197,8 +197,8 @@
                             <ColumnDefinition Width="Auto" />
                           </Grid.ColumnDefinitions>
                           <StackPanel VerticalAlignment="Center">
-                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="#CBD5D2" TextWrapping="Wrap" />
-                            <TextBlock Text="{Binding UnitPrice, StringFormat=C0}" FontSize="12" Foreground="#A1AEAB" Margin="0,3,0,0" />
+                            <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="#CCD5E1" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding UnitPrice, StringFormat=C0}" FontSize="12" Foreground="#9AA9BB" Margin="0,3,0,0" />
                             <TextBlock Text="{Binding DiscountLabel}" FontSize="10" Foreground="#FFD18B" Margin="0,2,0,0" />
                             <Button Content="Descuento" Padding="4,2" FontSize="10" Margin="0,3,0,0"
                                     Tag="{Binding}" Click="Discount_Click" HorizontalAlignment="Left" />
@@ -211,7 +211,7 @@
                           </StackPanel>
                           <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" MinWidth="82">
                             <TextBlock Text="{Binding LineTotal, StringFormat=C0}" FontWeight="Bold"
-                                       Foreground="#EEF2EF" HorizontalAlignment="Right" />
+                                       Foreground="#F1F4F8" HorizontalAlignment="Right" />
                             <Button Content="Quitar" Padding="3,2" FontSize="11" Background="Transparent"
                                     Foreground="#FFB4AB" Tag="{Binding}" Click="RemoveLine_Click" HorizontalAlignment="Right" />
                           </StackPanel>
@@ -232,46 +232,46 @@
                       </Style.Triggers>
                     </Style>
                   </StackPanel.Style>
-                  <Border Width="62" Height="62" Background="#25383A" CornerRadius="20"
+                  <Border Width="62" Height="62" Background="#293F5C" CornerRadius="20"
                           HorizontalAlignment="Center" Margin="0,0,0,14">
-                    <TextBlock Text="&#xE7BF;" FontFamily="Segoe MDL2 Assets" FontSize="26" Foreground="#71CABB"
+                    <TextBlock Text="&#xE7BF;" FontFamily="Segoe MDL2 Assets" FontSize="26" Foreground="#8FB4EA"
                                HorizontalAlignment="Center" VerticalAlignment="Center" />
                   </Border>
                   <TextBlock Text="Tu venta está vacía" FontSize="16" FontWeight="SemiBold"
-                             Foreground="#CBD5D2" HorizontalAlignment="Center" />
+                             Foreground="#CCD5E1" HorizontalAlignment="Center" />
                   <TextBlock Text="Elige un producto del catálogo o escanea su código."
-                             FontSize="12" Foreground="#909E9B" TextAlignment="Center"
+                             FontSize="12" Foreground="#8A99AE" TextAlignment="Center"
                              TextWrapping="Wrap" HorizontalAlignment="Center" Margin="0,6,0,16" />
                   <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Border Background="#202B2F" CornerRadius="5" Padding="8,5" Margin="0,0,7,0">
-                      <TextBlock Text="F2  Buscar" FontSize="10" FontWeight="SemiBold" Foreground="#A1AEAB" />
+                    <Border Background="#24354A" CornerRadius="5" Padding="8,5" Margin="0,0,7,0">
+                      <TextBlock Text="F2  Buscar" FontSize="10" FontWeight="SemiBold" Foreground="#9AA9BB" />
                     </Border>
-                    <Border Background="#202B2F" CornerRadius="5" Padding="8,5">
-                      <TextBlock Text="F3  Escanear" FontSize="10" FontWeight="SemiBold" Foreground="#A1AEAB" />
+                    <Border Background="#24354A" CornerRadius="5" Padding="8,5">
+                      <TextBlock Text="F3  Escanear" FontSize="10" FontWeight="SemiBold" Foreground="#9AA9BB" />
                     </Border>
                   </StackPanel>
                 </StackPanel>
               </Grid>
               <StackPanel Grid.Row="3" Margin="0,15,0,0">
                 <Grid Margin="0,0,0,6"><Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                  <TextBlock Text="Subtotal" Foreground="#A1AEAB" /><TextBlock x:Name="SubtotalText" Grid.Column="1" Foreground="#CBD5D2" />
+                  <TextBlock Text="Subtotal" Foreground="#9AA9BB" /><TextBlock x:Name="SubtotalText" Grid.Column="1" Foreground="#CCD5E1" />
                 </Grid>
                 <Grid Margin="0,0,0,6"><Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                  <TextBlock Text="Descuentos" Foreground="#A1AEAB" /><TextBlock x:Name="DiscountText" Grid.Column="1" Foreground="#FFD18B" />
+                  <TextBlock Text="Descuentos" Foreground="#9AA9BB" /><TextBlock x:Name="DiscountText" Grid.Column="1" Foreground="#FFD18B" />
                 </Grid>
                 <Grid Margin="0,0,0,10"><Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                  <TextBlock Text="Impuestos" Foreground="#A1AEAB" /><TextBlock x:Name="TaxText" Grid.Column="1" Foreground="#CBD5D2" />
+                  <TextBlock Text="Impuestos" Foreground="#9AA9BB" /><TextBlock x:Name="TaxText" Grid.Column="1" Foreground="#CCD5E1" />
                 </Grid>
-                <Border Height="1" Background="#303A3D" Margin="0,0,0,10" />
+                <Border Height="1" Background="#2E3D52" Margin="0,0,0,10" />
                 <Grid Margin="0,0,0,15"><Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                  <TextBlock Text="TOTAL" FontSize="15" FontWeight="Bold" Foreground="#EEF2EF" />
-                  <TextBlock x:Name="TotalText" Grid.Column="1" FontSize="23" FontWeight="Bold" Foreground="#71CABB" />
+                  <TextBlock Text="TOTAL" FontSize="15" FontWeight="Bold" Foreground="#F1F4F8" />
+                  <TextBlock x:Name="TotalText" Grid.Column="1" FontSize="23" FontWeight="Bold" Foreground="#8FB4EA" />
                 </Grid>
                 <Grid Margin="0,0,0,10">
                   <Grid.ColumnDefinitions><ColumnDefinition /><ColumnDefinition Width="10" /><ColumnDefinition /><ColumnDefinition Width="10" /><ColumnDefinition /></Grid.ColumnDefinitions>
                   <Button Content="Suspender" Click="SuspendSale_Click" />
                   <Button Grid.Column="2" Content="Reanudar" Click="ResumeSale_Click" />
-                  <Button x:Name="ChargeButton" Grid.Column="4" Content="Cobrar venta" Click="Charge_Click" Background="#36A995"
+                  <Button x:Name="ChargeButton" Grid.Column="4" Content="Cobrar venta" Click="Charge_Click" Background="#2E6BC7"
                           Foreground="White" FontSize="14" />
                 </Grid>
               </StackPanel>
@@ -291,37 +291,37 @@
           <Grid Margin="0,0,0,14">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
             <StackPanel>
-              <TextBlock Text="Turno de caja" FontSize="22" FontWeight="Bold" Foreground="#EEF2EF" />
-              <TextBlock Text="Controla el fondo, los movimientos y el arqueo del cajero." Foreground="#A1AEAB" Margin="0,4,0,0" />
+              <TextBlock Text="Turno de caja" FontSize="22" FontWeight="Bold" Foreground="#F1F4F8" />
+              <TextBlock Text="Controla el fondo, los movimientos y el arqueo del cajero." Foreground="#9AA9BB" Margin="0,4,0,0" />
             </StackPanel>
             <Button Grid.Column="1" Content="Actualizar" Click="RefreshShiftPage_Click" VerticalAlignment="Center" Margin="0,0,10,0" />
             <Button Grid.Column="2" Content="Gestionar turno" Click="Shift_Click" VerticalAlignment="Center"
-                    Background="#36A995" Foreground="White" />
+                    Background="#2E6BC7" Foreground="White" />
           </Grid>
           <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,14">
-            <Border Background="#1A252A" CornerRadius="5" Padding="16" Margin="0,0,10,0">
-              <StackPanel><TextBlock Text="ESTADO" FontSize="11" FontWeight="Bold" Foreground="#A1AEAB" />
+            <Border Background="#1B2938" CornerRadius="5" Padding="16" Margin="0,0,10,0">
+              <StackPanel><TextBlock Text="ESTADO" FontSize="11" FontWeight="Bold" Foreground="#9AA9BB" />
                 <TextBlock x:Name="ShiftStatusText" Text="Sin turno abierto" FontSize="19" FontWeight="Bold" Foreground="#FFD18B" Margin="0,6,0,0" /></StackPanel>
             </Border>
-            <Border Background="#1A252A" CornerRadius="5" Padding="16" Margin="0,0,10,0">
-              <StackPanel><TextBlock Text="FONDO INICIAL" FontSize="11" FontWeight="Bold" Foreground="#A1AEAB" />
-                <TextBlock x:Name="ShiftOpeningText" Text="$ 0" FontSize="19" FontWeight="Bold" Foreground="#EEF2EF" Margin="0,6,0,0" /></StackPanel>
+            <Border Background="#1B2938" CornerRadius="5" Padding="16" Margin="0,0,10,0">
+              <StackPanel><TextBlock Text="FONDO INICIAL" FontSize="11" FontWeight="Bold" Foreground="#9AA9BB" />
+                <TextBlock x:Name="ShiftOpeningText" Text="$ 0" FontSize="19" FontWeight="Bold" Foreground="#F1F4F8" Margin="0,6,0,0" /></StackPanel>
             </Border>
-            <Border Background="#1A252A" CornerRadius="5" Padding="16" Margin="0,0,10,0">
-              <StackPanel><TextBlock Text="EFECTIVO ESPERADO" FontSize="11" FontWeight="Bold" Foreground="#A1AEAB" />
-                <TextBlock x:Name="ShiftExpectedText" Text="$ 0" FontSize="19" FontWeight="Bold" Foreground="#71CABB" Margin="0,6,0,0" /></StackPanel>
+            <Border Background="#1B2938" CornerRadius="5" Padding="16" Margin="0,0,10,0">
+              <StackPanel><TextBlock Text="EFECTIVO ESPERADO" FontSize="11" FontWeight="Bold" Foreground="#9AA9BB" />
+                <TextBlock x:Name="ShiftExpectedText" Text="$ 0" FontSize="19" FontWeight="Bold" Foreground="#8FB4EA" Margin="0,6,0,0" /></StackPanel>
             </Border>
-            <Border Background="#1A252A" CornerRadius="5" Padding="16">
-              <StackPanel><TextBlock Text="APERTURA" FontSize="11" FontWeight="Bold" Foreground="#A1AEAB" />
-                <TextBlock x:Name="ShiftOpenedText" Text="--" FontSize="19" FontWeight="Bold" Foreground="#EEF2EF" Margin="0,6,0,0" /></StackPanel>
+            <Border Background="#1B2938" CornerRadius="5" Padding="16">
+              <StackPanel><TextBlock Text="APERTURA" FontSize="11" FontWeight="Bold" Foreground="#9AA9BB" />
+                <TextBlock x:Name="ShiftOpenedText" Text="--" FontSize="19" FontWeight="Bold" Foreground="#F1F4F8" Margin="0,6,0,0" /></StackPanel>
             </Border>
           </UniformGrid>
-          <TextBlock Grid.Row="2" Text="Actividad reciente" FontSize="17" FontWeight="Bold" Foreground="#EEF2EF" Margin="0,0,0,8" />
+          <TextBlock Grid.Row="2" Text="Actividad reciente" FontSize="17" FontWeight="Bold" Foreground="#F1F4F8" Margin="0,0,0,8" />
           <Grid Grid.Row="3">
             <Grid.ColumnDefinitions><ColumnDefinition Width="1.2*" /><ColumnDefinition Width="10" /><ColumnDefinition Width="1.5*" /></Grid.ColumnDefinitions>
-            <Border Background="#1A252A" CornerRadius="5" Padding="12">
+            <Border Background="#1B2938" CornerRadius="5" Padding="12">
               <DockPanel>
-                <TextBlock DockPanel.Dock="Top" Text="Movimientos del turno actual" FontWeight="Bold" Foreground="#CBD5D2" Margin="2,0,0,8" />
+                <TextBlock DockPanel.Dock="Top" Text="Movimientos del turno actual" FontWeight="Bold" Foreground="#CCD5E1" Margin="2,0,0,8" />
                 <DataGrid x:Name="ShiftMovementsGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False"
                           HeadersVisibility="Column" RowHeight="36" BorderThickness="0">
                   <DataGrid.Columns>
@@ -352,9 +352,9 @@
                 </DataGrid>
               </DockPanel>
             </Border>
-            <Border Grid.Column="2" Background="#1A252A" CornerRadius="5" Padding="12">
+            <Border Grid.Column="2" Background="#1B2938" CornerRadius="5" Padding="12">
               <DockPanel>
-                <TextBlock DockPanel.Dock="Top" Text="Historial de turnos" FontWeight="Bold" Foreground="#CBD5D2" Margin="2,0,0,8" />
+                <TextBlock DockPanel.Dock="Top" Text="Historial de turnos" FontWeight="Bold" Foreground="#CCD5E1" Margin="2,0,0,8" />
                 <DataGrid x:Name="ShiftHistoryGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False"
                           HeadersVisibility="Column" RowHeight="36" BorderThickness="0">
                   <DataGrid.Columns>
@@ -382,15 +382,15 @@
           <Grid Margin="0,0,0,14">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
             <StackPanel>
-              <TextBlock Text="Inventario y catálogo" FontSize="23" FontWeight="Bold" Foreground="#EEF2EF" />
-              <TextBlock x:Name="InventorySummaryText" Foreground="#A1AEAB" FontSize="13" Margin="0,4,0,0" />
+              <TextBlock Text="Inventario y catálogo" FontSize="23" FontWeight="Bold" Foreground="#F1F4F8" />
+              <TextBlock x:Name="InventorySummaryText" Foreground="#9AA9BB" FontSize="13" Margin="0,4,0,0" />
             </StackPanel>
             <Button x:Name="EditInventoryButton" Grid.Column="1" Content="Editar producto"
                     Click="EditProduct_Click" IsEnabled="False" Margin="10,0,0,0" />
             <Button Grid.Column="2" Content="＋  Nuevo producto" Click="NewProduct_Click"
-                    Background="#36A995" Foreground="White" Margin="10,0,0,0" />
+                    Background="#2E6BC7" Foreground="White" Margin="10,0,0,0" />
           </Grid>
-          <Border Grid.Row="1" Background="#1A252A" BorderBrush="#303A3D" BorderThickness="1"
+          <Border Grid.Row="1" Background="#1B2938" BorderBrush="#2E3D52" BorderThickness="1"
                   CornerRadius="5" Padding="12" Margin="0,0,0,14">
             <Grid>
               <Grid.ColumnDefinitions>
@@ -403,7 +403,7 @@
               <Grid Margin="0,0,8,0">
                 <TextBox x:Name="InventorySearchBox" Padding="13,10" ToolTip="Buscar por nombre, código o categoría"
                          TextChanged="InventorySearch_TextChanged" />
-                <TextBlock Text="⌕  Buscar producto, código o categoría" Foreground="#909E9B"
+                <TextBlock Text="⌕  Buscar producto, código o categoría" Foreground="#8A99AE"
                            Margin="13,0,8,0" VerticalAlignment="Center" IsHitTestVisible="False">
                   <TextBlock.Style>
                     <Style TargetType="TextBlock">
@@ -471,7 +471,7 @@
                           <Grid.RenderTransform>
                             <TranslateTransform x:Name="CardOffset" Y="7" />
                           </Grid.RenderTransform>
-                          <Border x:Name="CardBorder" Background="#1A252A" BorderBrush="#303A3D"
+                          <Border x:Name="CardBorder" Background="#1B2938" BorderBrush="#2E3D52"
                                   BorderThickness="1" CornerRadius="5" Padding="16">
                             <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
                           </Border>
@@ -488,12 +488,12 @@
                             </BeginStoryboard>
                           </EventTrigger>
                           <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="CardBorder" Property="BorderBrush" Value="#3D5652" />
-                            <Setter TargetName="CardBorder" Property="Background" Value="#1D2A2D" />
+                            <Setter TargetName="CardBorder" Property="BorderBrush" Value="#536B88" />
+                            <Setter TargetName="CardBorder" Property="Background" Value="#24354B" />
                           </Trigger>
                           <Trigger Property="IsSelected" Value="True">
-                            <Setter TargetName="CardBorder" Property="BorderBrush" Value="#36A995" />
-                            <Setter TargetName="CardBorder" Property="Background" Value="#25383A" />
+                            <Setter TargetName="CardBorder" Property="BorderBrush" Value="#2E6BC7" />
+                            <Setter TargetName="CardBorder" Property="Background" Value="#293F5C" />
                           </Trigger>
                         </ControlTemplate.Triggers>
                       </ControlTemplate>
@@ -510,8 +510,8 @@
                       <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid>
-                      <Border Background="#202B2F" CornerRadius="5" Padding="9,5" HorizontalAlignment="Left">
-                        <TextBlock Text="{Binding Category}" FontSize="11" FontWeight="SemiBold" Foreground="#B8C4C0" />
+                      <Border Background="#24354A" CornerRadius="5" Padding="9,5" HorizontalAlignment="Left">
+                        <TextBlock Text="{Binding Category}" FontSize="11" FontWeight="SemiBold" Foreground="#BBC7D4" />
                       </Border>
                       <Border Background="{Binding StockStatusBackground}" CornerRadius="5" Padding="9,5"
                               HorizontalAlignment="Right">
@@ -524,35 +524,35 @@
                       </Border>
                     </Grid>
                     <StackPanel Grid.Row="1" Margin="0,13,0,12" VerticalAlignment="Center">
-                      <TextBlock Text="{Binding Name}" FontSize="17" FontWeight="Bold" Foreground="#EEF2EF"
+                      <TextBlock Text="{Binding Name}" FontSize="17" FontWeight="Bold" Foreground="#F1F4F8"
                                  TextWrapping="Wrap" MaxHeight="46" TextTrimming="CharacterEllipsis" />
                       <StackPanel Orientation="Horizontal" Margin="0,7,0,0">
                         <TextBlock Text="&#xE8EC;" FontFamily="Segoe MDL2 Assets" FontSize="12"
-                                   Foreground="#909E9B" Margin="0,0,6,0" />
-                        <TextBlock Text="{Binding Barcode}" FontSize="12" Foreground="#A1AEAB" />
+                                   Foreground="#8A99AE" Margin="0,0,6,0" />
+                        <TextBlock Text="{Binding Barcode}" FontSize="12" Foreground="#9AA9BB" />
                       </StackPanel>
                     </StackPanel>
                     <Grid Grid.Row="2" Margin="0,9,0,0">
                       <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                       <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="PRECIO UNITARIO" FontSize="9" FontWeight="Bold" Foreground="#909E9B" />
+                        <TextBlock Text="PRECIO UNITARIO" FontSize="9" FontWeight="Bold" Foreground="#8A99AE" />
                         <TextBlock Text="{Binding UnitPrice, StringFormat={}{0:C0}}" FontSize="20"
-                                   FontWeight="Bold" Foreground="#71CABB" Margin="0,2,0,0" />
+                                   FontWeight="Bold" Foreground="#8FB4EA" Margin="0,2,0,0" />
                       </StackPanel>
-                      <Border Grid.Column="1" Background="#263237" CornerRadius="5" Padding="11,8"
+                      <Border Grid.Column="1" Background="#25364D" CornerRadius="5" Padding="11,8"
                               VerticalAlignment="Center">
                         <StackPanel>
-                          <TextBlock Text="EXISTENCIAS" FontSize="9" FontWeight="Bold" Foreground="#909E9B" />
+                          <TextBlock Text="EXISTENCIAS" FontSize="9" FontWeight="Bold" Foreground="#8A99AE" />
                           <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
                             <TextBlock Text="{Binding Stock, StringFormat={}{0:N3}}" FontSize="13"
-                                       FontWeight="Bold" Foreground="#CBD5D2" />
-                            <TextBlock Text="{Binding Unit}" FontSize="11" Foreground="#A1AEAB"
+                                       FontWeight="Bold" Foreground="#CCD5E1" />
+                            <TextBlock Text="{Binding Unit}" FontSize="11" Foreground="#9AA9BB"
                                        VerticalAlignment="Center" Margin="5,0,0,0" />
                           </StackPanel>
                           <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
-                            <TextBlock Text="Mín." FontSize="10" Foreground="#909E9B" />
+                            <TextBlock Text="Mín." FontSize="10" Foreground="#8A99AE" />
                             <TextBlock Text="{Binding MinimumStock, StringFormat={}{0:N3}}" FontSize="10"
-                                       Foreground="#A1AEAB" Margin="4,0,0,0" />
+                                       Foreground="#9AA9BB" Margin="4,0,0,0" />
                           </StackPanel>
                         </StackPanel>
                       </Border>
@@ -562,18 +562,18 @@
               </ListBox.ItemTemplate>
             </ListBox>
 
-            <Border x:Name="InventoryEmptyStatePanel" Background="#11191E" Visibility="Collapsed"
+            <Border x:Name="InventoryEmptyStatePanel" Background="#101722" Visibility="Collapsed"
                     IsHitTestVisible="False">
               <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="380">
-                <Border Width="58" Height="58" Background="#263A3A" CornerRadius="18"
+                <Border Width="58" Height="58" Background="#304664" CornerRadius="18"
                         HorizontalAlignment="Center" Margin="0,0,0,16">
-                  <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" FontSize="24" Foreground="#71CABB"
+                  <TextBlock Text="&#xE721;" FontFamily="Segoe MDL2 Assets" FontSize="24" Foreground="#8FB4EA"
                              HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Border>
-                <TextBlock Text="No encontramos productos" FontSize="18" FontWeight="Bold" Foreground="#EEF2EF"
+                <TextBlock Text="No encontramos productos" FontSize="18" FontWeight="Bold" Foreground="#F1F4F8"
                            HorizontalAlignment="Center" />
                 <TextBlock Text="Prueba con otra búsqueda o cambia los filtros para ver más resultados."
-                           FontSize="13" Foreground="#A1AEAB" TextWrapping="Wrap" TextAlignment="Center"
+                           FontSize="13" Foreground="#9AA9BB" TextWrapping="Wrap" TextAlignment="Center"
                            Margin="0,7,0,0" />
               </StackPanel>
             </Border>
@@ -581,10 +581,10 @@
 
           <Grid Grid.Row="3" Margin="2,12,2,0">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-            <TextBlock x:Name="InventoryRangeText" Foreground="#A1AEAB" FontSize="12"
+            <TextBlock x:Name="InventoryRangeText" Foreground="#9AA9BB" FontSize="12"
                        VerticalAlignment="Center" />
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-              <TextBlock Text="Productos por página" Foreground="#A1AEAB" FontSize="12"
+              <TextBlock Text="Productos por página" Foreground="#9AA9BB" FontSize="12"
                          VerticalAlignment="Center" Margin="0,0,8,0" />
               <ComboBox x:Name="InventoryPageSizeBox" Width="78" SelectedIndex="0" Margin="0,0,14,0"
                         SelectionChanged="InventoryPageSize_SelectionChanged" ToolTip="Tamaño de página">
@@ -594,8 +594,8 @@
               </ComboBox>
               <Button x:Name="InventoryPreviousPageButton" Content="‹" Width="40" Padding="8,6"
                       Click="InventoryPreviousPage_Click" ToolTip="Página anterior" />
-              <Border Background="#263A3A" CornerRadius="5" Padding="13,8" Margin="8,0">
-                <TextBlock x:Name="InventoryPageText" Foreground="#71CABB" FontWeight="SemiBold"
+              <Border Background="#304664" CornerRadius="5" Padding="13,8" Margin="8,0">
+                <TextBlock x:Name="InventoryPageText" Foreground="#8FB4EA" FontWeight="SemiBold"
                            FontSize="12" VerticalAlignment="Center" />
               </Border>
               <Button x:Name="InventoryNextPageButton" Content="›" Width="40" Padding="8,6"
@@ -611,41 +611,41 @@
           <Grid Margin="0,0,0,14">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
             <StackPanel>
-              <TextBlock Text="Reportes de ventas" FontSize="22" FontWeight="Bold" Foreground="#EEF2EF" />
-              <TextBlock Text="Filtra el periodo y consulta ventas, medios de pago y productos." Foreground="#A1AEAB" Margin="0,4,0,0" />
+              <TextBlock Text="Reportes de ventas" FontSize="22" FontWeight="Bold" Foreground="#F1F4F8" />
+              <TextBlock Text="Filtra el periodo y consulta ventas, medios de pago y productos." Foreground="#9AA9BB" Margin="0,4,0,0" />
             </StackPanel>
             <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,8,0">
-              <TextBlock Text="Desde" FontSize="11" FontWeight="SemiBold" Foreground="#A1AEAB" Margin="0,0,0,3" />
+              <TextBlock Text="Desde" FontSize="11" FontWeight="SemiBold" Foreground="#9AA9BB" Margin="0,0,0,3" />
               <DatePicker x:Name="ReportFromDate" Width="140" />
             </StackPanel>
             <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="0,0,8,0">
-              <TextBlock Text="Hasta" FontSize="11" FontWeight="SemiBold" Foreground="#A1AEAB" Margin="0,0,0,3" />
+              <TextBlock Text="Hasta" FontSize="11" FontWeight="SemiBold" Foreground="#9AA9BB" Margin="0,0,0,3" />
               <DatePicker x:Name="ReportToDate" Width="140" />
             </StackPanel>
             <Button Grid.Column="3" Content="Actualizar" Click="RefreshReport_Click" VerticalAlignment="Center"
-                    Background="#36A995" Foreground="White" />
+                    Background="#2E6BC7" Foreground="White" />
           </Grid>
           <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,14">
-            <Border Background="#1A252A" CornerRadius="5" Padding="16" Margin="0,0,10,0">
-              <StackPanel><TextBlock Text="Ventas" Foreground="#A1AEAB" /><TextBlock x:Name="TodayCountText" FontSize="24" FontWeight="Bold" Foreground="#EEF2EF" Margin="0,5,0,0" /></StackPanel>
+            <Border Background="#1B2938" CornerRadius="5" Padding="16" Margin="0,0,10,0">
+              <StackPanel><TextBlock Text="Ventas" Foreground="#9AA9BB" /><TextBlock x:Name="TodayCountText" FontSize="24" FontWeight="Bold" Foreground="#F1F4F8" Margin="0,5,0,0" /></StackPanel>
             </Border>
-            <Border Background="#1A252A" CornerRadius="5" Padding="16" Margin="0,0,10,0">
-              <StackPanel><TextBlock Text="Total vendido" Foreground="#A1AEAB" /><TextBlock x:Name="TodayTotalText" FontSize="24" FontWeight="Bold" Foreground="#71CABB" Margin="0,5,0,0" /></StackPanel>
+            <Border Background="#1B2938" CornerRadius="5" Padding="16" Margin="0,0,10,0">
+              <StackPanel><TextBlock Text="Total vendido" Foreground="#9AA9BB" /><TextBlock x:Name="TodayTotalText" FontSize="24" FontWeight="Bold" Foreground="#8FB4EA" Margin="0,5,0,0" /></StackPanel>
             </Border>
-            <Border Background="#1A252A" CornerRadius="5" Padding="16" Margin="0,0,10,0">
-              <StackPanel><TextBlock Text="Efectivo" Foreground="#A1AEAB" /><TextBlock x:Name="TodayCashText" FontSize="24" FontWeight="Bold" Foreground="#EEF2EF" Margin="0,5,0,0" /></StackPanel>
+            <Border Background="#1B2938" CornerRadius="5" Padding="16" Margin="0,0,10,0">
+              <StackPanel><TextBlock Text="Efectivo" Foreground="#9AA9BB" /><TextBlock x:Name="TodayCashText" FontSize="24" FontWeight="Bold" Foreground="#F1F4F8" Margin="0,5,0,0" /></StackPanel>
             </Border>
-            <Border Background="#1A252A" CornerRadius="5" Padding="16">
-              <StackPanel><TextBlock Text="Tarjeta y otros" Foreground="#A1AEAB" /><TextBlock x:Name="TodayOtherText" FontSize="24" FontWeight="Bold" Foreground="#EEF2EF" Margin="0,5,0,0" /></StackPanel>
+            <Border Background="#1B2938" CornerRadius="5" Padding="16">
+              <StackPanel><TextBlock Text="Tarjeta y otros" Foreground="#9AA9BB" /><TextBlock x:Name="TodayOtherText" FontSize="24" FontWeight="Bold" Foreground="#F1F4F8" Margin="0,5,0,0" /></StackPanel>
             </Border>
           </UniformGrid>
           <Grid Grid.Row="2">
             <Grid.ColumnDefinitions><ColumnDefinition Width="1.5*" /><ColumnDefinition Width="10" /><ColumnDefinition Width="1*" /></Grid.ColumnDefinitions>
-            <Border Background="#1A252A" CornerRadius="5" Padding="12">
+            <Border Background="#1B2938" CornerRadius="5" Padding="12">
               <DockPanel>
-                <TextBlock DockPanel.Dock="Top" Text="Ventas del periodo" FontWeight="Bold" Foreground="#CBD5D2" Margin="2,0,0,8" />
+                <TextBlock DockPanel.Dock="Top" Text="Ventas del periodo" FontWeight="Bold" Foreground="#CCD5E1" Margin="2,0,0,8" />
                 <DataGrid x:Name="RecentSalesGrid" AutoGenerateColumns="False" IsReadOnly="True"
-                          CanUserAddRows="False" HeadersVisibility="Column" Background="#1A252A" BorderThickness="0" RowHeight="38">
+                          CanUserAddRows="False" HeadersVisibility="Column" Background="#1B2938" BorderThickness="0" RowHeight="38">
                   <DataGrid.ContextMenu>
                     <ContextMenu>
                       <MenuItem Header="Reimprimir comprobante" Click="ReprintSale_Click" />
@@ -662,15 +662,15 @@
                 </DataGrid>
               </DockPanel>
             </Border>
-            <Border Grid.Column="2" Background="#1A252A" CornerRadius="5" Padding="12">
+            <Border Grid.Column="2" Background="#1B2938" CornerRadius="5" Padding="12">
               <TabControl TabStripPlacement="Top" Background="Transparent">
                 <TabItem Header="Productos" Tag="&#xE7B8;" Width="125" Padding="8,7">
                   <Grid Margin="4">
                     <Grid.RowDefinitions><RowDefinition Height="*" /><RowDefinition Height="*" /></Grid.RowDefinitions>
                     <DockPanel Margin="0,0,0,5">
-                      <TextBlock DockPanel.Dock="Top" Text="Más vendidos" FontWeight="Bold" Foreground="#CBD5D2" Margin="2,0,0,6" />
+                      <TextBlock DockPanel.Dock="Top" Text="Más vendidos" FontWeight="Bold" Foreground="#CCD5E1" Margin="2,0,0,6" />
                       <DataGrid x:Name="ProductPerformanceGrid" AutoGenerateColumns="False" IsReadOnly="True"
-                                CanUserAddRows="False" HeadersVisibility="Column" Background="#1A252A" BorderThickness="0" RowHeight="32">
+                                CanUserAddRows="False" HeadersVisibility="Column" Background="#1B2938" BorderThickness="0" RowHeight="32">
                         <DataGrid.Columns>
                           <DataGridTextColumn Header="Producto" Binding="{Binding ProductName}" Width="*" />
                           <DataGridTextColumn Header="Cant." Binding="{Binding QuantitySold, StringFormat=N2}" Width="70" />
@@ -679,9 +679,9 @@
                       </DataGrid>
                     </DockPanel>
                     <DockPanel Grid.Row="1" Margin="0,5,0,0">
-                      <TextBlock DockPanel.Dock="Top" Text="Menos vendidos" FontWeight="Bold" Foreground="#CBD5D2" Margin="2,0,0,6" />
+                      <TextBlock DockPanel.Dock="Top" Text="Menos vendidos" FontWeight="Bold" Foreground="#CCD5E1" Margin="2,0,0,6" />
                       <DataGrid x:Name="LowProductPerformanceGrid" AutoGenerateColumns="False" IsReadOnly="True"
-                                CanUserAddRows="False" HeadersVisibility="Column" Background="#1A252A" BorderThickness="0" RowHeight="32">
+                                CanUserAddRows="False" HeadersVisibility="Column" Background="#1B2938" BorderThickness="0" RowHeight="32">
                         <DataGrid.Columns>
                           <DataGridTextColumn Header="Producto" Binding="{Binding ProductName}" Width="*" />
                           <DataGridTextColumn Header="Cant." Binding="{Binding QuantitySold, StringFormat=N2}" Width="70" />
@@ -693,7 +693,7 @@
                 </TabItem>
                 <TabItem Header="Cajeros" Tag="&#xE77B;" Width="125" Padding="8,7">
                   <DataGrid x:Name="CashierPerformanceGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False"
-                            HeadersVisibility="Column" Background="#1A252A" BorderThickness="0" RowHeight="38" Margin="4">
+                            HeadersVisibility="Column" Background="#1B2938" BorderThickness="0" RowHeight="38" Margin="4">
                     <DataGrid.Columns>
                       <DataGridTextColumn Header="Cajero" Binding="{Binding CashierName}" Width="*" />
                       <DataGridTextColumn Header="Ventas" Binding="{Binding SalesCount}" Width="72" />
@@ -703,7 +703,7 @@
                 </TabItem>
                 <TabItem Header="Turnos" Tag="&#xE8D7;" Width="125" Padding="8,7">
                   <DataGrid x:Name="ShiftPerformanceGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False"
-                            HeadersVisibility="Column" Background="#1A252A" BorderThickness="0" RowHeight="38" Margin="4">
+                            HeadersVisibility="Column" Background="#1B2938" BorderThickness="0" RowHeight="38" Margin="4">
                     <DataGrid.Columns>
                       <DataGridTextColumn Header="N.º" Binding="{Binding ShiftId}" Width="65" />
                       <DataGridTextColumn Header="Cajero" Binding="{Binding CashierName}" Width="*" />
@@ -724,12 +724,12 @@
           <Grid Margin="0,0,0,14">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
             <StackPanel>
-              <TextBlock Text="Auditoría" FontSize="22" FontWeight="Bold" Foreground="#EEF2EF" />
-              <TextBlock Text="Registro de operaciones realizadas por usuarios en este punto de venta." Foreground="#A1AEAB" Margin="0,4,0,0" />
+              <TextBlock Text="Auditoría" FontSize="22" FontWeight="Bold" Foreground="#F1F4F8" />
+              <TextBlock Text="Registro de operaciones realizadas por usuarios en este punto de venta." Foreground="#9AA9BB" Margin="0,4,0,0" />
             </StackPanel>
             <Button Grid.Column="1" Content="Actualizar" Click="RefreshAudit_Click" VerticalAlignment="Center" />
           </Grid>
-          <Border Grid.Row="1" Background="#1A252A" CornerRadius="5" Padding="12">
+          <Border Grid.Row="1" Background="#1B2938" CornerRadius="5" Padding="12">
             <DataGrid x:Name="AuditEventsGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False"
                       HeadersVisibility="Column" RowHeight="38" BorderThickness="0">
               <DataGrid.Columns>
@@ -749,30 +749,30 @@
           <Grid Margin="0,0,0,14">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
             <StackPanel>
-              <TextBlock Text="Conectividad y resiliencia" FontSize="22" FontWeight="Bold" Foreground="#EEF2EF" />
-              <TextBlock Text="La caja opera con base local y conserva eventos para sincronización posterior." Foreground="#A1AEAB" Margin="0,4,0,0" />
+              <TextBlock Text="Conectividad y resiliencia" FontSize="22" FontWeight="Bold" Foreground="#F1F4F8" />
+              <TextBlock Text="La caja opera con base local y conserva eventos para sincronización posterior." Foreground="#9AA9BB" Margin="0,4,0,0" />
             </StackPanel>
             <Button Grid.Column="1" Content="Actualizar estado" Click="RefreshConnectivity_Click" VerticalAlignment="Center" />
           </Grid>
           <UniformGrid Grid.Row="1" Columns="3" Margin="0,0,0,14">
-            <Border Background="#1A252A" CornerRadius="5" Padding="16" Margin="0,0,10,0">
-              <StackPanel><TextBlock Text="OPERACIÓN LOCAL" FontSize="11" FontWeight="Bold" Foreground="#A1AEAB" />
-                <TextBlock Text="Disponible sin internet" FontSize="18" FontWeight="Bold" Foreground="#71CABB" Margin="0,6,0,0" /></StackPanel>
+            <Border Background="#1B2938" CornerRadius="5" Padding="16" Margin="0,0,10,0">
+              <StackPanel><TextBlock Text="OPERACIÓN LOCAL" FontSize="11" FontWeight="Bold" Foreground="#9AA9BB" />
+                <TextBlock Text="Disponible sin internet" FontSize="18" FontWeight="Bold" Foreground="#8FB4EA" Margin="0,6,0,0" /></StackPanel>
             </Border>
-            <Border Background="#1A252A" CornerRadius="5" Padding="16" Margin="0,0,10,0">
-              <StackPanel><TextBlock Text="COLA DE SINCRONIZACIÓN" FontSize="11" FontWeight="Bold" Foreground="#A1AEAB" />
-                <TextBlock x:Name="PendingSyncCountText" Text="0 pendientes" FontSize="18" FontWeight="Bold" Foreground="#71CABB" Margin="0,6,0,0" />
-                <TextBlock x:Name="SyncStatusText" Text="Conector central no configurado" FontSize="11" Foreground="#A1AEAB" Margin="0,3,0,0" /></StackPanel>
+            <Border Background="#1B2938" CornerRadius="5" Padding="16" Margin="0,0,10,0">
+              <StackPanel><TextBlock Text="COLA DE SINCRONIZACIÓN" FontSize="11" FontWeight="Bold" Foreground="#9AA9BB" />
+                <TextBlock x:Name="PendingSyncCountText" Text="0 pendientes" FontSize="18" FontWeight="Bold" Foreground="#8FB4EA" Margin="0,6,0,0" />
+                <TextBlock x:Name="SyncStatusText" Text="Conector central no configurado" FontSize="11" Foreground="#9AA9BB" Margin="0,3,0,0" /></StackPanel>
             </Border>
-            <Border Background="#1A252A" CornerRadius="5" Padding="16">
-              <StackPanel><TextBlock Text="ÚLTIMA COPIA LOCAL" FontSize="11" FontWeight="Bold" Foreground="#A1AEAB" />
-                <TextBlock x:Name="LatestBackupText" Text="No disponible" FontSize="18" FontWeight="Bold" Foreground="#EEF2EF" Margin="0,6,0,0" />
-                <TextBlock Text="Se conservan hasta 14 copias diarias." FontSize="11" Foreground="#A1AEAB" Margin="0,3,0,0" /></StackPanel>
+            <Border Background="#1B2938" CornerRadius="5" Padding="16">
+              <StackPanel><TextBlock Text="ÚLTIMA COPIA LOCAL" FontSize="11" FontWeight="Bold" Foreground="#9AA9BB" />
+                <TextBlock x:Name="LatestBackupText" Text="No disponible" FontSize="18" FontWeight="Bold" Foreground="#F1F4F8" Margin="0,6,0,0" />
+                <TextBlock Text="Se conservan hasta 14 copias diarias." FontSize="11" Foreground="#9AA9BB" Margin="0,3,0,0" /></StackPanel>
             </Border>
           </UniformGrid>
-          <Border Grid.Row="2" Background="#1A252A" CornerRadius="5" Padding="12">
+          <Border Grid.Row="2" Background="#1B2938" CornerRadius="5" Padding="12">
             <DockPanel>
-              <TextBlock DockPanel.Dock="Top" Text="Eventos locales pendientes o enviados" FontWeight="Bold" Foreground="#CBD5D2" Margin="2,0,0,8" />
+              <TextBlock DockPanel.Dock="Top" Text="Eventos locales pendientes o enviados" FontWeight="Bold" Foreground="#CCD5E1" Margin="2,0,0,8" />
               <DataGrid x:Name="SyncQueueGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False"
                         HeadersVisibility="Column" RowHeight="38" BorderThickness="0">
                 <DataGrid.Columns>
@@ -795,14 +795,14 @@
           <Grid Margin="0,0,0,14">
             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
             <StackPanel>
-              <TextBlock Text="Usuarios y permisos" FontSize="22" FontWeight="Bold" Foreground="#EEF2EF" />
-              <TextBlock Text="Administra cajeros, supervisores y administradores. Los PIN se almacenan protegidos." Foreground="#A1AEAB" Margin="0,4,0,0" />
+              <TextBlock Text="Usuarios y permisos" FontSize="22" FontWeight="Bold" Foreground="#F1F4F8" />
+              <TextBlock Text="Administra cajeros, supervisores y administradores. Los PIN se almacenan protegidos." Foreground="#9AA9BB" Margin="0,4,0,0" />
             </StackPanel>
             <Button Grid.Column="1" Content="Restablecer PIN" Click="ResetUserPin_Click" VerticalAlignment="Center" Margin="0,0,8,0" />
             <Button Grid.Column="2" Content="Activar / desactivar" Click="ToggleUserActive_Click" VerticalAlignment="Center" Margin="0,0,8,0" />
-            <Button Grid.Column="3" Content="Nuevo usuario" Click="NewUser_Click" VerticalAlignment="Center" Background="#36A995" Foreground="White" />
+            <Button Grid.Column="3" Content="Nuevo usuario" Click="NewUser_Click" VerticalAlignment="Center" Background="#2E6BC7" Foreground="White" />
           </Grid>
-          <Border Grid.Row="1" Background="#1A252A" CornerRadius="5" Padding="12">
+          <Border Grid.Row="1" Background="#1B2938" CornerRadius="5" Padding="12">
             <DataGrid x:Name="UsersGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False"
                       HeadersVisibility="Column" RowHeight="42" BorderThickness="0" SelectionMode="Single">
               <DataGrid.Columns>
