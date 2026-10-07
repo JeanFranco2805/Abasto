@@ -14,6 +14,25 @@ var databaseDirectory = Path.Combine(
     "SupermercadoPOS", "Backend");
 var databasePath = Path.Combine(databaseDirectory, "supermercado-central.db");
 Directory.CreateDirectory(Path.GetDirectoryName(databasePath)!);
+var apiKeyPath = Path.Combine(databaseDirectory, "api-key.txt");
+var apiKey = builder.Configuration["Backend:ApiKey"];
+if (string.IsNullOrWhiteSpace(apiKey))
+{
+    apiKey = File.Exists(apiKeyPath)
+        ? (await File.ReadAllTextAsync(apiKeyPath)).Trim()
+        : "";
+    if (string.IsNullOrWhiteSpace(apiKey))
+    {
+        apiKey = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32));
+        await File.WriteAllTextAsync(apiKeyPath, apiKey);
+    }
+    builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
+    {
+        ["Backend:ApiKey"] = apiKey
+    });
+    Console.WriteLine($"Clave de API central: {apiKey}");
+    Console.WriteLine($"Clave guardada en: {apiKeyPath}");
+}
 var connectionString = string.IsNullOrWhiteSpace(configuredConnection)
     ? $"Data Source={databasePath}"
     : configuredConnection;
