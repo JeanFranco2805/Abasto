@@ -5,11 +5,11 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using SupermercadoPOS.Dialogs;
-using SupermercadoPOS.Domain;
-using SupermercadoPOS.Services;
+using Abasto.Dialogs;
+using Abasto.Domain;
+using Abasto.Services;
 
-namespace SupermercadoPOS;
+namespace Abasto;
 
 public partial class MainWindow : Window
 {
