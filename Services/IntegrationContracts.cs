@@ -1,4 +1,4 @@
-namespace SupermercadoPOS.Services;
+namespace Abasto.Services;
 
 public sealed record ReceiptLine(string Description, decimal Quantity, string Unit, decimal UnitPrice, decimal Total);
 public sealed record ReceiptData(string StoreName, string TicketNumber, DateTime CreatedAt, string Cashier,
