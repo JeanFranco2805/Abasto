@@ -20,9 +20,12 @@ public static class PosService
 
     public static async Task InitializeAsync(string databasePath)
     {
+        if (File.Exists(databasePath))
+            await CreateDailyBackupAsync(databasePath);
         await using var db = PosDbContext.Create(databasePath);
         await db.Database.EnsureCreatedAsync();
         await EnsureProductImageColumnAsync(db);
+        await EnsureReturnAndFiscalSchemaAsync(db);
 
         await RemoveLegacySampleDataAsync(db);
 
@@ -115,6 +118,101 @@ public static class PosService
         {
             await db.Database.CloseConnectionAsync();
         }
+    }
+
+    private static async Task EnsureReturnAndFiscalSchemaAsync(PosDbContext db)
+    {
+        await db.Database.OpenConnectionAsync();
+        try
+        {
+            await EnsureColumnAsync(db, "Sales", "ReturnedTotal");
+            await EnsureColumnAsync(db, "SaleItems", "ReturnedQuantity");
+            await EnsureColumnAsync(db, "SaleItems", "ReturnedAmount");
+            await db.Database.ExecuteSqlRawAsync("""
+                CREATE TABLE IF NOT EXISTS "SaleReturns" (
+                    "Id" INTEGER NOT NULL CONSTRAINT "PK_SaleReturns" PRIMARY KEY AUTOINCREMENT,
+                    "SaleId" INTEGER NOT NULL,
+                    "CreatedAtUtc" TEXT NOT NULL,
+                    "CashierId" INTEGER NOT NULL,
+                    "CashierName" TEXT NOT NULL,
+                    "SupervisorId" INTEGER NOT NULL,
+                    "SupervisorName" TEXT NOT NULL,
+                    "Reason" TEXT NOT NULL,
+                    "Total" TEXT NOT NULL,
+                    CONSTRAINT "FK_SaleReturns_Sales_SaleId" FOREIGN KEY ("SaleId") REFERENCES "Sales" ("Id") ON DELETE CASCADE
+                );
+                CREATE INDEX IF NOT EXISTS "IX_SaleReturns_SaleId_CreatedAtUtc" ON "SaleReturns" ("SaleId", "CreatedAtUtc");
+                CREATE TABLE IF NOT EXISTS "SaleReturnItems" (
+                    "Id" INTEGER NOT NULL CONSTRAINT "PK_SaleReturnItems" PRIMARY KEY AUTOINCREMENT,
+                    "SaleReturnId" INTEGER NOT NULL,
+                    "SaleItemId" INTEGER NOT NULL,
+                    "ProductId" INTEGER NOT NULL,
+                    "ProductName" TEXT NOT NULL,
+                    "Unit" TEXT NOT NULL,
+                    "Quantity" TEXT NOT NULL,
+                    "Amount" TEXT NOT NULL,
+                    CONSTRAINT "FK_SaleReturnItems_SaleReturns_SaleReturnId" FOREIGN KEY ("SaleReturnId") REFERENCES "SaleReturns" ("Id") ON DELETE CASCADE
+                );
+                CREATE INDEX IF NOT EXISTS "IX_SaleReturnItems_SaleReturnId" ON "SaleReturnItems" ("SaleReturnId");
+                CREATE TABLE IF NOT EXISTS "SaleReturnPayments" (
+                    "Id" INTEGER NOT NULL CONSTRAINT "PK_SaleReturnPayments" PRIMARY KEY AUTOINCREMENT,
+                    "SaleReturnId" INTEGER NOT NULL,
+                    "OriginalPaymentId" INTEGER NOT NULL,
+                    "Method" TEXT NOT NULL,
+                    "Amount" TEXT NOT NULL,
+                    "ExternalReference" TEXT NULL,
+                    CONSTRAINT "FK_SaleReturnPayments_SaleReturns_SaleReturnId" FOREIGN KEY ("SaleReturnId") REFERENCES "SaleReturns" ("Id") ON DELETE CASCADE
+                );
+                CREATE INDEX IF NOT EXISTS "IX_SaleReturnPayments_SaleReturnId" ON "SaleReturnPayments" ("SaleReturnId");
+                CREATE TABLE IF NOT EXISTS "FiscalDocuments" (
+                    "Id" INTEGER NOT NULL CONSTRAINT "PK_FiscalDocuments" PRIMARY KEY AUTOINCREMENT,
+                    "SaleId" INTEGER NOT NULL,
+                    "SaleReturnId" INTEGER NULL,
+                    "Kind" TEXT NOT NULL,
+                    "Status" TEXT NOT NULL,
+                    "Provider" TEXT NOT NULL,
+                    "DocumentNumber" TEXT NOT NULL,
+                    "ProviderDocumentId" TEXT NOT NULL,
+                    "ResponsePayload" TEXT NOT NULL,
+                    "Error" TEXT NOT NULL,
+                    "CreatedAtUtc" TEXT NOT NULL
+                );
+                CREATE INDEX IF NOT EXISTS "IX_FiscalDocuments_SaleId_Kind_Status" ON "FiscalDocuments" ("SaleId", "Kind", "Status");
+                """);
+        }
+        finally
+        {
+            await db.Database.CloseConnectionAsync();
+        }
+    }
+
+    private static async Task EnsureColumnAsync(PosDbContext db, string table, string column)
+    {
+        var found = false;
+        await using (var command = db.Database.GetDbConnection().CreateCommand())
+        {
+            command.CommandText = $"PRAGMA table_info(\"{table}\");";
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                if (string.Equals(reader.GetString(1), column, StringComparison.OrdinalIgnoreCase))
+                {
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        if (found)
+            return;
+        var sql = (table, column) switch
+        {
+            ("Sales", "ReturnedTotal") => "ALTER TABLE \"Sales\" ADD COLUMN \"ReturnedTotal\" TEXT NOT NULL DEFAULT '0';",
+            ("SaleItems", "ReturnedQuantity") => "ALTER TABLE \"SaleItems\" ADD COLUMN \"ReturnedQuantity\" TEXT NOT NULL DEFAULT '0';",
+            ("SaleItems", "ReturnedAmount") => "ALTER TABLE \"SaleItems\" ADD COLUMN \"ReturnedAmount\" TEXT NOT NULL DEFAULT '0';",
+            _ => throw new InvalidOperationException("No se reconoce la actualización de base de datos solicitada.")
+        };
+        await db.Database.ExecuteSqlRawAsync(sql);
     }
 
     public static async Task CreateDailyBackupAsync(string databasePath)
@@ -615,6 +713,8 @@ public static class PosService
         return await db.Sales.AsNoTracking()
             .Include(s => s.Items)
             .Include(s => s.Payments)
+            .Include(s => s.Returns)
+                .ThenInclude(item => item.Payments)
             .FirstOrDefaultAsync(s => s.Id == saleId);
     }
 
@@ -670,6 +770,179 @@ public static class PosService
         await CreateDailyBackupAsync(App.DatabasePath);
     }
 
+    public static async Task<SaleReturn> ReturnSaleItemsAsync(
+        long saleId,
+        IReadOnlyCollection<SaleReturnLineDraft> requestedLines,
+        PosUser supervisor,
+        string reason)
+    {
+        var cashier = RequireUser();
+        reason = reason.Trim();
+        if (requestedLines.Count == 0)
+            throw new InvalidOperationException("Selecciona al menos un producto y una cantidad para devolver.");
+        if (string.IsNullOrWhiteSpace(reason))
+            throw new InvalidOperationException("Escribe el motivo de la devolución.");
+        if (supervisor.Role == "Cajero")
+            throw new InvalidOperationException("Se requiere autorización de supervisor.");
+
+        await using var db = App.CreateDbContext();
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        var verifiedSupervisor = await db.Users.AsNoTracking()
+            .AnyAsync(user => user.Id == supervisor.Id && user.IsActive && user.Role != "Cajero");
+        if (!verifiedSupervisor)
+            throw new InvalidOperationException("La autorización de supervisor ya no es válida.");
+
+        var sale = await db.Sales
+            .Include(item => item.Items)
+            .Include(item => item.Payments)
+            .Include(item => item.Returns)
+                .ThenInclude(item => item.Payments)
+            .FirstOrDefaultAsync(item => item.Id == saleId
+                && (item.Status == "Completada" || item.Status == "Devuelta parcialmente"))
+            ?? throw new InvalidOperationException("La venta no existe o ya fue devuelta por completo.");
+        var currentShift = await db.CashShifts.FirstOrDefaultAsync(shift =>
+            shift.CashierId == cashier.Id && shift.Status == "Abierto")
+            ?? throw new InvalidOperationException("Abre un turno antes de entregar una devolución en efectivo.");
+
+        if (requestedLines.GroupBy(item => item.SaleItemId).Any(group => group.Count() > 1))
+            throw new InvalidOperationException("La devolución contiene productos repetidos.");
+
+        var returnRecord = new SaleReturn
+        {
+            SaleId = sale.Id,
+            CashierId = cashier.Id,
+            CashierName = cashier.DisplayName,
+            SupervisorId = supervisor.Id,
+            SupervisorName = supervisor.DisplayName,
+            Reason = reason,
+            CreatedAtUtc = DateTime.UtcNow
+        };
+
+        foreach (var draft in requestedLines)
+        {
+            if (draft.Quantity <= 0)
+                throw new InvalidOperationException("La cantidad a devolver debe ser mayor que cero.");
+            var soldItem = sale.Items.FirstOrDefault(item => item.Id == draft.SaleItemId)
+                ?? throw new InvalidOperationException("Uno de los productos no pertenece a esta venta.");
+            var remainingQuantity = soldItem.Quantity - soldItem.ReturnedQuantity;
+            if (draft.Quantity > remainingQuantity)
+                throw new InvalidOperationException($"Solo quedan {remainingQuantity:N3} {soldItem.Unit} disponibles para devolver de {soldItem.ProductName}.");
+
+            var amount = draft.Quantity == remainingQuantity
+                ? Money(soldItem.LineTotal - soldItem.ReturnedAmount)
+                : Money(soldItem.LineTotal / soldItem.Quantity * draft.Quantity);
+            if (amount <= 0)
+                throw new InvalidOperationException("El valor de devolución calculado no es válido.");
+
+            soldItem.ReturnedQuantity += draft.Quantity;
+            soldItem.ReturnedAmount += amount;
+            returnRecord.Items.Add(new SaleReturnItem
+            {
+                SaleItemId = soldItem.Id,
+                ProductId = soldItem.ProductId,
+                ProductName = soldItem.ProductName,
+                Unit = soldItem.Unit,
+                Quantity = draft.Quantity,
+                Amount = amount
+            });
+
+            var product = await db.Products.FirstOrDefaultAsync(item => item.Id == soldItem.ProductId)
+                ?? throw new InvalidOperationException($"No se encontró el producto {soldItem.ProductName} para reponer inventario.");
+            product.Stock += draft.Quantity;
+            product.UpdatedAtUtc = DateTime.UtcNow;
+            db.SyncQueue.Add(CreateSyncEvent("Product", product.Id.ToString(), "ProductStockUpdated", ProductPayload(product)));
+        }
+
+        returnRecord.Total = Money(returnRecord.Items.Sum(item => item.Amount));
+        var previouslyRefundedCash = sale.Returns.SelectMany(item => item.Payments)
+            .Where(item => item.Method == "Efectivo")
+            .GroupBy(item => item.OriginalPaymentId)
+            .ToDictionary(group => group.Key, group => group.Sum(item => item.Amount));
+        var remainingRefund = returnRecord.Total;
+        foreach (var payment in sale.Payments.Where(item => item.Method == "Efectivo").OrderBy(item => item.Id))
+        {
+            var alreadyRefunded = previouslyRefundedCash.GetValueOrDefault(payment.Id);
+            var available = Money(payment.Amount - alreadyRefunded);
+            var amount = Math.Min(available, remainingRefund);
+            if (amount <= 0)
+                continue;
+            returnRecord.Payments.Add(new SaleReturnPayment
+            {
+                OriginalPaymentId = payment.Id,
+                Method = payment.Method,
+                Amount = amount,
+                ExternalReference = payment.ExternalReference
+            });
+            remainingRefund = Money(remainingRefund - amount);
+            if (remainingRefund == 0)
+                break;
+        }
+
+        if (remainingRefund > 0)
+            throw new InvalidOperationException("La venta no tiene suficiente pago en efectivo pendiente de devolución. Para devolver tarjeta o transferencia se debe conectar el datáfono.");
+
+        sale.ReturnedTotal = Money(sale.ReturnedTotal + returnRecord.Total);
+        sale.Status = sale.Items.All(item => item.ReturnedQuantity >= item.Quantity) ? "Devuelta" : "Devuelta parcialmente";
+        db.SaleReturns.Add(returnRecord);
+        db.CashMovements.Add(new CashMovement
+        {
+            CashShiftId = currentShift.Id,
+            UserId = supervisor.Id,
+            UserName = supervisor.DisplayName,
+            IsCashIn = false,
+            Amount = returnRecord.Total,
+            Reason = $"Devolución de venta #{sale.Id}"
+        });
+        await db.SaveChangesAsync();
+
+        db.SyncQueue.Add(CreateSyncEvent("Sale", sale.Id.ToString(), "SaleReturned", SalePayload(sale)));
+        db.SyncQueue.Add(CreateSyncEvent("SaleReturn", returnRecord.Id.ToString(), "SaleReturnCompleted", SaleReturnPayload(returnRecord)));
+        await AddAuditAsync(db, "Devolución de venta",
+            $"Venta #{sale.Id}; devolución {returnRecord.Total:C0}; motivo: {reason}; autorizó {supervisor.DisplayName}");
+        await db.SaveChangesAsync();
+        await transaction.CommitAsync();
+        await CreateDailyBackupAsync(App.DatabasePath);
+        return returnRecord;
+    }
+
+    public static async Task<List<SaleReturn>> GetSaleReturnsAsync(long saleId)
+    {
+        await using var db = App.CreateDbContext();
+        return await db.SaleReturns.AsNoTracking()
+            .Include(item => item.Items)
+            .Include(item => item.Payments)
+            .Where(item => item.SaleId == saleId)
+            .OrderByDescending(item => item.CreatedAtUtc)
+            .ToListAsync();
+    }
+
+    public static async Task SaveFiscalDocumentAsync(FiscalDocument document)
+    {
+        await using var db = App.CreateDbContext();
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        db.FiscalDocuments.Add(document);
+        await db.SaveChangesAsync();
+        db.SyncQueue.Add(CreateSyncEvent("FiscalDocument", document.Id.ToString(),
+            document.Status == "Emitida" ? "FiscalDocumentIssued" : "FiscalDocumentFailed", document));
+        var operation = document.Status == "Emitida" ? "emitida" : "fallida";
+        await AddAuditAsync(db, document.Kind == "Factura" ? $"Factura electrónica {operation}" : $"Nota crédito {operation}",
+            document.Status == "Emitida"
+                ? $"Venta #{document.SaleId}; documento {document.DocumentNumber}; proveedor {document.Provider}"
+                : $"Venta #{document.SaleId}; error: {document.Error}");
+        await db.SaveChangesAsync();
+        await transaction.CommitAsync();
+        await CreateDailyBackupAsync(App.DatabasePath);
+    }
+
+    public static async Task<List<FiscalDocument>> GetFiscalDocumentsAsync(long saleId)
+    {
+        await using var db = App.CreateDbContext();
+        return await db.FiscalDocuments.AsNoTracking()
+            .Where(item => item.SaleId == saleId)
+            .OrderByDescending(item => item.CreatedAtUtc)
+            .ToListAsync();
+    }
+
     public static async Task<SalesSummary> GetTodaySummaryAsync()
     {
         var localStart = DateTime.Today;
@@ -678,13 +951,14 @@ public static class PosService
         await using var db = App.CreateDbContext();
         var sales = await db.Sales.AsNoTracking()
             .Include(s => s.Payments)
-            .Where(s => s.Status == "Completada" && s.CreatedAtUtc >= startUtc && s.CreatedAtUtc < endUtc)
+            .Where(s => (s.Status == "Completada" || s.Status == "Devuelta parcialmente")
+                && s.CreatedAtUtc >= startUtc && s.CreatedAtUtc < endUtc)
             .ToListAsync();
         var payments = sales.SelectMany(s => s.Payments).ToList();
         return new SalesSummary(
             sales.Count,
-            sales.Sum(s => s.Total),
-            payments.Where(p => p.Method == "Efectivo").Sum(p => p.Amount),
+            sales.Sum(s => s.Total - s.ReturnedTotal),
+            payments.Where(p => p.Method == "Efectivo").Sum(p => p.Amount) - sales.Sum(s => s.ReturnedTotal),
             payments.Where(p => p.Method == "Tarjeta").Sum(p => p.Amount),
             payments.Where(p => p.Method is not ("Efectivo" or "Tarjeta")).Sum(p => p.Amount));
     }
@@ -694,7 +968,7 @@ public static class PosService
         await using var db = App.CreateDbContext();
         return await db.Sales.AsNoTracking()
             .Include(s => s.Payments)
-            .Where(s => s.Status == "Completada")
+            .Where(s => s.Status == "Completada" || s.Status == "Devuelta parcialmente")
             .OrderByDescending(s => s.CreatedAtUtc)
             .Take(count)
             .ToListAsync();
@@ -706,8 +980,9 @@ public static class PosService
         var endUtc = toLocal.Date.AddDays(1).ToUniversalTime();
         await using var db = App.CreateDbContext();
         return await db.Sales.AsNoTracking()
+            .Include(s => s.Items)
             .Include(s => s.Payments)
-            .Where(s => (s.Status == "Completada" || s.Status == "Anulada")
+            .Where(s => (s.Status == "Completada" || s.Status == "Devuelta parcialmente" || s.Status == "Devuelta" || s.Status == "Anulada")
                 && s.CreatedAtUtc >= startUtc && s.CreatedAtUtc < endUtc)
             .OrderByDescending(s => s.CreatedAtUtc)
             .ToListAsync();
@@ -731,7 +1006,7 @@ public static class PosService
             .Include(sale => sale.Items)
             .Include(sale => sale.Payments)
             .Where(sale => saleIds.Contains(sale.Id)
-                && (sale.Status == "Completada" || sale.Status == "Anulada")
+                && (sale.Status == "Completada" || sale.Status == "Devuelta parcialmente" || sale.Status == "Devuelta" || sale.Status == "Anulada")
                 && sale.CreatedAtUtc >= startUtc && sale.CreatedAtUtc < endUtc)
             .ToListAsync();
     }
@@ -787,12 +1062,12 @@ public static class PosService
     public static async Task<SalesSummary> GetSalesSummaryBetweenAsync(DateTime fromLocal, DateTime toLocal)
     {
         var sales = await GetSalesBetweenAsync(fromLocal, toLocal);
-        var completed = sales.Where(s => s.Status == "Completada").ToList();
+        var completed = sales.Where(s => s.Status == "Completada" || s.Status == "Devuelta parcialmente").ToList();
         var payments = completed.SelectMany(s => s.Payments).ToList();
         return new SalesSummary(
             completed.Count,
-            completed.Sum(s => s.Total),
-            payments.Where(p => p.Method == "Efectivo").Sum(p => p.Amount),
+            completed.Sum(s => s.Total - s.ReturnedTotal),
+            payments.Where(p => p.Method == "Efectivo").Sum(p => p.Amount) - completed.Sum(s => s.ReturnedTotal),
             payments.Where(p => p.Method == "Tarjeta").Sum(p => p.Amount),
             payments.Where(p => p.Method is not ("Efectivo" or "Tarjeta")).Sum(p => p.Amount));
     }
@@ -804,11 +1079,13 @@ public static class PosService
         await using var db = App.CreateDbContext();
         var items = await db.SaleItems.AsNoTracking()
             .Include(i => i.Sale)
-            .Where(i => i.Sale != null && i.Sale.Status == "Completada"
+            .Where(i => i.Sale != null && (i.Sale.Status == "Completada" || i.Sale.Status == "Devuelta parcialmente")
                 && i.Sale.CreatedAtUtc >= startUtc && i.Sale.CreatedAtUtc < endUtc)
             .ToListAsync();
         var totals = items.GroupBy(i => i.ProductId)
-            .ToDictionary(group => group.Key, group => (Quantity: group.Sum(i => i.Quantity), Revenue: group.Sum(i => i.LineTotal)));
+            .ToDictionary(group => group.Key, group => (
+                Quantity: group.Sum(i => i.Quantity - i.ReturnedQuantity),
+                Revenue: group.Sum(i => i.LineTotal - i.ReturnedAmount)));
         var products = await db.Products.AsNoTracking().Where(product => product.IsActive).ToListAsync();
         return products.Select(product =>
             {
@@ -936,6 +1213,7 @@ public static class PosService
         sale.DiscountTotal,
         sale.TaxTotal,
         sale.Total,
+        sale.ReturnedTotal,
         Items = sale.Items.Select(item => new
         {
             item.ProductId,
@@ -949,9 +1227,40 @@ public static class PosService
             item.DiscountAmount,
             item.LineSubtotal,
             item.LineTax,
-            item.LineTotal
+            item.LineTotal,
+            item.ReturnedQuantity,
+            item.ReturnedAmount
         }),
-        Payments = sale.Payments.Select(payment => new { payment.Method, payment.Amount, payment.Tendered, payment.Change })
+        Payments = sale.Payments.Select(payment => new { payment.Method, payment.Amount, payment.Tendered, payment.Change, payment.ExternalReference })
+    };
+
+    private static object SaleReturnPayload(SaleReturn saleReturn) => new
+    {
+        saleReturn.Id,
+        saleReturn.SaleId,
+        saleReturn.CreatedAtUtc,
+        saleReturn.CashierId,
+        saleReturn.CashierName,
+        saleReturn.SupervisorId,
+        saleReturn.SupervisorName,
+        saleReturn.Reason,
+        saleReturn.Total,
+        Items = saleReturn.Items.Select(item => new
+        {
+            item.SaleItemId,
+            item.ProductId,
+            item.ProductName,
+            item.Unit,
+            item.Quantity,
+            item.Amount
+        }),
+        Payments = saleReturn.Payments.Select(payment => new
+        {
+            payment.OriginalPaymentId,
+            payment.Method,
+            payment.Amount,
+            payment.ExternalReference
+        })
     };
 
     private static PosUser CreateUser(string username, string displayName, string pin, string role)
