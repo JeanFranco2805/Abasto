@@ -1,4 +1,4 @@
-<Application x:Class="SupermercadoPOS.App"
+<Application x:Class="Abasto.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              ShutdownMode="OnExplicitShutdown">
@@ -173,7 +173,7 @@
                                Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Center" />
                   </Border>
                   <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="SUPERMERCADO POS" FontSize="10" FontWeight="Bold" Foreground="#9FB4CD" />
+                    <TextBlock Text="ABASTO POS" FontSize="10" FontWeight="Bold" Foreground="#9FB4CD" />
                     <TextBlock Text="Caja e inventario" FontSize="14" FontWeight="Bold"
                                Foreground="#F1F4F8" Margin="0,2,0,0" />
                   </StackPanel>
