@@ -5,8 +5,8 @@
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>SupermercadoPOS</RootNamespace>
-    <AssemblyName>SupermercadoPOS</AssemblyName>
+    <RootNamespace>Abasto</RootNamespace>
+    <AssemblyName>Abasto</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
