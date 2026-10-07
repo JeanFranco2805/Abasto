@@ -114,7 +114,7 @@ public partial class MainWindow : Window
 
     private void AddToCart(Product product)
     {
-        var quantityStep = product.Unit == "KG" ? 0.1m : 1m;
+        var quantityStep = ProductUnitRules.AllowsFractionalQuantity(product.Unit) ? 0.1m : 1m;
         var existing = Cart.FirstOrDefault(c => c.ProductId == product.Id);
         var nextQuantity = (existing?.Quantity ?? 0m) + quantityStep;
         if (nextQuantity > product.Stock)
@@ -804,6 +804,7 @@ public sealed class InventoryProductCard(Product product)
     public string Barcode => Product.Barcode;
     public string Category => string.IsNullOrWhiteSpace(Product.Category) ? "Sin categoría" : Product.Category;
     public string Unit => Product.Unit;
+    public string ImagePath => Product.ImagePath;
     public decimal UnitPrice => Product.UnitPrice;
     public decimal Stock => Product.Stock;
     public decimal MinimumStock => Product.MinimumStock;
