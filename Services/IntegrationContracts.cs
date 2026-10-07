@@ -1,8 +1,10 @@
 namespace Abasto.Services;
 
 public sealed record ReceiptLine(string Description, decimal Quantity, string Unit, decimal UnitPrice, decimal Total);
+public sealed record ReceiptPayment(string Method, decimal Amount);
 public sealed record ReceiptData(string StoreName, string TicketNumber, DateTime CreatedAt, string Cashier,
-    IReadOnlyCollection<ReceiptLine> Lines, decimal Subtotal, decimal Tax, decimal Total, decimal Change);
+    IReadOnlyCollection<ReceiptLine> Lines, IReadOnlyCollection<ReceiptPayment> Payments,
+    decimal Subtotal, decimal Tax, decimal Total, decimal Change);
 
 public interface IReceiptPrinter
 {
