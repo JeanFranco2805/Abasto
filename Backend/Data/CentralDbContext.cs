@@ -1,7 +1,7 @@
-using Backend.Domain;
+using Abasto.Backend.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Backend.Data;
+namespace Abasto.Backend.Data;
 
 public sealed class CentralDbContext(DbContextOptions<CentralDbContext> options) : DbContext(options)
 {
