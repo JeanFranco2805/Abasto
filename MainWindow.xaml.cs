@@ -53,7 +53,22 @@ public partial class MainWindow : Window
 
     private async Task ReloadProductsAsync()
     {
-        var products = await PosService.GetProductsAsync();
+        var localProducts = await PosService.GetProductsAsync();
+        DisplayProducts.Clear();
+        _allProducts.Clear();
+        _allProducts.AddRange(localProducts);
+        ApplyProductFilters();
+        RefreshInventoryCategories();
+        ApplyInventoryFilter();
+
+        var serverProducts = await BackendSyncService.GetServerProductsAsync();
+        InventoryDataSourceText.Text = serverProducts is null
+            ? "Fuente: copia local"
+            : "Fuente: servidor central";
+        if (serverProducts is null)
+            return;
+
+        var products = await PosService.MergeServerProductsAsync(serverProducts);
         _allProducts.Clear();
         _allProducts.AddRange(products);
         ApplyProductFilters();
@@ -583,14 +598,33 @@ public partial class MainWindow : Window
             ReportFromDate.SelectedDate = from;
             ReportToDate.SelectedDate = to;
         }
-        var summary = await PosService.GetSalesSummaryBetweenAsync(from, to);
+        var serverSales = await BackendSyncService.GetServerSalesAsync(from, to);
+        ReportsDataSourceText.Text = serverSales is null
+            ? "Fuente: copia local"
+            : "Fuente: servidor central";
+        var sales = serverSales ?? await PosService.GetSalesBetweenAsync(from, to);
+        if (serverSales is not null)
+        {
+            var pendingLocalSales = await PosService.GetPendingSalesBetweenAsync(from, to);
+            var mergedSales = serverSales.ToDictionary(sale => sale.Id);
+            foreach (var sale in pendingLocalSales)
+                mergedSales[sale.Id] = sale;
+            sales = mergedSales.Values.OrderByDescending(sale => sale.CreatedAtUtc).ToList();
+        }
+
+        var completed = sales.Where(sale => sale.Status == "Completada").ToList();
+        var payments = completed.SelectMany(sale => sale.Payments).ToList();
+        var summary = new SalesSummary(
+            completed.Count,
+            completed.Sum(sale => sale.Total),
+            payments.Where(payment => payment.Method == "Efectivo").Sum(payment => payment.Amount),
+            payments.Where(payment => payment.Method == "Tarjeta").Sum(payment => payment.Amount),
+            payments.Where(payment => payment.Method is not ("Efectivo" or "Tarjeta")).Sum(payment => payment.Amount));
         TodayCountText.Text = summary.SaleCount.ToString("N0");
         TodayTotalText.Text = summary.GrossSales.ToString("C0");
         TodayCashText.Text = summary.CashTotal.ToString("C0");
         TodayOtherText.Text = (summary.CardTotal + summary.OtherPayments).ToString("C0");
-        var sales = await PosService.GetSalesBetweenAsync(from, to);
         RecentSalesGrid.ItemsSource = sales;
-        var completed = sales.Where(sale => sale.Status == "Completada").ToList();
         CashierPerformanceGrid.ItemsSource = completed
             .GroupBy(sale => new { sale.CashierId, sale.CashierName })
             .Select(group =>
@@ -607,7 +641,14 @@ public partial class MainWindow : Window
             .Select(group => new SalesByShiftRow(group.Key.ShiftId, group.Key.CashierName, group.Count(), group.Sum(sale => sale.Total)))
             .OrderByDescending(row => row.ShiftId)
             .ToList();
-        var performance = await PosService.GetProductPerformanceAsync(from, to);
+        var performance = serverSales is null
+            ? await PosService.GetProductPerformanceAsync(from, to)
+            : completed.SelectMany(sale => sale.Items)
+                .GroupBy(item => new { item.ProductId, item.ProductName, item.Barcode })
+                .Select(group => new ProductPerformanceRow(group.Key.ProductName, group.Key.Barcode,
+                    group.Sum(item => item.Quantity), group.Sum(item => item.LineTotal)))
+                .OrderByDescending(row => row.QuantitySold)
+                .ToList();
         ProductPerformanceGrid.ItemsSource = performance.Take(10).ToList();
         LowProductPerformanceGrid.ItemsSource = performance.OrderBy(row => row.QuantitySold).Take(10).ToList();
     }
@@ -672,6 +713,12 @@ public partial class MainWindow : Window
         BackendConnectionText.Text = result.IsConnected
             ? $"API central conectada · Identificador de esta caja: {(await BackendSettingsService.LoadAsync()).ClientId[..8]}"
             : result.Message;
+        if (result.IsConnected)
+        {
+            await ReloadProductsAsync();
+            if (ReferenceEquals(MainTabs.SelectedItem, ReportsTab))
+                await LoadReportsAsync();
+        }
         await RefreshConnectivityAsync();
     }
 
