@@ -1,4 +1,4 @@
-namespace SupermercadoPOS.Domain;
+namespace Abasto.Domain;
 
 public static class ProductUnitRules
 {
