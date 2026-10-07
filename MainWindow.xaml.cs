@@ -796,8 +796,8 @@ public sealed class InventoryProductCard(Product product)
     private static readonly Brush EmptyForeground = CreateBrush(0xFF, 0xB4, 0xAB);
     private static readonly Brush LowBackground = CreateBrush(0x43, 0x36, 0x24);
     private static readonly Brush LowForeground = CreateBrush(0xFF, 0xD1, 0x8B);
-    private static readonly Brush AvailableBackground = CreateBrush(0x1C, 0x3D, 0x38);
-    private static readonly Brush AvailableForeground = CreateBrush(0x75, 0xE0, 0xA7);
+    private static readonly Brush AvailableBackground = CreateBrush(0x22, 0x36, 0x50);
+    private static readonly Brush AvailableForeground = CreateBrush(0x9F, 0xC1, 0xEF);
 
     public Product Product { get; } = product;
     public string Name => Product.Name;
