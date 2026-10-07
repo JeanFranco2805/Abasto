@@ -17,6 +17,7 @@ public static class PosService
     {
         await using var db = PosDbContext.Create(databasePath);
         await db.Database.EnsureCreatedAsync();
+        await EnsureProductImageColumnAsync(db);
 
         if (!await db.Products.AnyAsync())
         {
@@ -39,6 +40,36 @@ public static class PosService
             db.Users.Add(CreateUser("supervisor", "Supervisor de demostración", "1234", "Supervisor"));
             db.Users.Add(CreateUser("admin", "Administrador de demostración", "2468", "Administrador"));
             await db.SaveChangesAsync();
+        }
+    }
+
+    private static async Task EnsureProductImageColumnAsync(PosDbContext db)
+    {
+        await db.Database.OpenConnectionAsync();
+        try
+        {
+            var connection = db.Database.GetDbConnection();
+            var hasImagePath = false;
+            await using (var command = connection.CreateCommand())
+            {
+                command.CommandText = "PRAGMA table_info('Products');";
+                await using var reader = await command.ExecuteReaderAsync();
+                while (await reader.ReadAsync())
+                {
+                    if (string.Equals(reader.GetString(1), "ImagePath", StringComparison.OrdinalIgnoreCase))
+                    {
+                        hasImagePath = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!hasImagePath)
+                await db.Database.ExecuteSqlRawAsync("ALTER TABLE \"Products\" ADD COLUMN \"ImagePath\" TEXT NOT NULL DEFAULT '';");
+        }
+        finally
+        {
+            await db.Database.CloseConnectionAsync();
         }
     }
 
@@ -212,6 +243,7 @@ public static class PosService
             stored.Name = product.Name.Trim();
             stored.Category = product.Category.Trim();
             stored.Unit = product.Unit;
+            stored.ImagePath = product.ImagePath;
             stored.UnitPrice = product.UnitPrice;
             stored.TaxRate = product.TaxRate;
             stored.Stock = product.Stock;
@@ -222,6 +254,13 @@ public static class PosService
             await AddAuditAsync(db, "Producto actualizado", $"{stored.Name} ({stored.Barcode})");
         }
         await CreateDailyBackupAsync(App.DatabasePath);
+    }
+
+    public static async Task<bool> IsProductUnitInUseAsync(string unit)
+    {
+        await using var db = App.CreateDbContext();
+        return await db.Products.AnyAsync(product => product.Unit == unit)
+            || await db.SaleItems.AnyAsync(item => item.Unit == unit);
     }
 
     public static async Task<CashShift?> GetOpenShiftAsync(int cashierId)
