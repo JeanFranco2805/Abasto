@@ -1,4 +1,4 @@
-namespace Backend.Domain;
+namespace Abasto.Backend.Domain;
 
 public sealed class CentralSyncEvent
 {
