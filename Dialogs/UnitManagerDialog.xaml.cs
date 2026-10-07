@@ -1,8 +1,8 @@
 using System.Collections.ObjectModel;
 using System.Windows;
-using SupermercadoPOS.Services;
+using Abasto.Services;
 
-namespace SupermercadoPOS.Dialogs;
+namespace Abasto.Dialogs;
 
 public partial class UnitManagerDialog : Window
 {
