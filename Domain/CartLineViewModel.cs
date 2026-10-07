@@ -15,7 +15,7 @@ public sealed class CartLineViewModel : INotifyPropertyChanged
     public string Unit { get; }
     public decimal UnitPrice { get; }
     public decimal TaxRate { get; }
-    public bool IsWeighted => Unit == "KG";
+    public bool IsWeighted => ProductUnitRules.AllowsFractionalQuantity(Unit);
 
     public decimal Quantity
     {
@@ -35,7 +35,7 @@ public sealed class CartLineViewModel : INotifyPropertyChanged
         }
     }
 
-    public string QuantityText => IsWeighted ? $"{Quantity:0.000} kg" : $"{Quantity:0} und";
+    public string QuantityText => IsWeighted ? $"{Quantity:0.000} {Unit}" : $"{Quantity:0} {Unit}";
     public decimal LineSubtotal => Money(UnitPrice * Quantity);
     public decimal DiscountRate
     {
