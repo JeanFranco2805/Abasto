@@ -10,15 +10,15 @@
     <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
     <StackPanel Margin="0,0,0,14">
       <TextBlock Text="Aplicar descuento" FontSize="24" FontWeight="Bold" Foreground="#F1F4F8" />
-      <TextBlock Text="El cambio requiere aprobación de supervisor." Foreground="#9AA9BB" Margin="0,4,0,0" />
+      <TextBlock Text="El cambio requiere autorización de administrador o supervisor." Foreground="#9AA9BB" Margin="0,4,0,0" />
     </StackPanel>
     <Border Grid.Row="1" Background="#1B2938" CornerRadius="5" Padding="18">
       <StackPanel>
         <TextBlock Text="Porcentaje (0 a 100)" Style="{StaticResource FieldLabel}" />
         <TextBox x:Name="PercentBox" Text="5" Margin="0,0,0,14" />
-        <TextBlock Text="Usuario supervisor" Style="{StaticResource FieldLabel}" />
-        <TextBox x:Name="UsernameBox" Text="supervisor" Margin="0,0,0,14" />
-        <TextBlock Text="PIN supervisor" Style="{StaticResource FieldLabel}" />
+        <TextBlock Text="Usuario autorizador" Style="{StaticResource FieldLabel}" />
+        <TextBox x:Name="UsernameBox" Text="admin" Margin="0,0,0,14" />
+        <TextBlock Text="PIN autorizador" Style="{StaticResource FieldLabel}" />
         <PasswordBox x:Name="PinBox" Padding="10,8" FontSize="14" Margin="0,0,0,10" />
         <TextBlock x:Name="ErrorText" Foreground="#FFB4AB" TextWrapping="Wrap" />
       </StackPanel>
