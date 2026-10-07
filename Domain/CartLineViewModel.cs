@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace SupermercadoPOS.Domain;
+namespace Abasto.Domain;
 
 public sealed class CartLineViewModel : INotifyPropertyChanged
 {
