@@ -17,10 +17,11 @@ dotnet run --project .\SupermercadoPOS.csproj
 En el equipo que alojará el backend, desde la carpeta del proyecto:
 
 ```powershell
-$env:Backend__ApiKey = "reemplaza-por-una-clave-larga-y-privada"
 $env:ASPNETCORE_URLS = "http://0.0.0.0:5080"
 dotnet run --project .\Backend\Backend.csproj
 ```
+
+Al primer arranque, el backend genera una clave aleatoria, la muestra en la consola y la guarda en `%LOCALAPPDATA%\SupermercadoPOS\Backend\api-key.txt`. Si el POS se ejecuta con la misma cuenta de Windows, carga automáticamente esa clave y usa `http://localhost:5080`. También puedes definir `Backend__ApiKey` para administrar la clave desde el entorno.
 
 La base central SQLite se crea en `%LOCALAPPDATA%\SupermercadoPOS\Backend\supermercado-central.db` en el equipo que ejecuta la API. Para usar PostgreSQL en el servidor, configura las variables antes de iniciar la API:
 
@@ -29,14 +30,14 @@ $env:Database__Provider = "PostgreSql"
 $env:ConnectionStrings__CentralDatabase = "Host=servidor;Database=supermercado_pos;Username=pos_app;Password=clave"
 ```
 
-El proceso de la API también necesita `Backend__ApiKey`. Para una instalación accesible fuera de la red local, coloca la API detrás de HTTPS y restringe el acceso de red al servidor.
+Para una instalación accesible fuera de la red local, coloca la API detrás de HTTPS y restringe el acceso de red al servidor.
 
 ## Conectar las cajas
 
 1. Inicia el backend y confirma que `http://localhost:5080/health` muestra `status: ok` desde el mismo servidor.
 2. En cada caja abre **Conectividad**.
 3. Escribe la URL de la API (`http://IP-DEL-SERVIDOR:5080` en la red local o su URL HTTPS) y la misma clave configurada en el servidor.
-4. Pulsa **Guardar conexión**. La caja envía automáticamente eventos pendientes y vuelve a intentarlo cada 45 segundos.
+4. Si el servidor está en otro equipo, escribe también la clave que aparece en su consola o archivo `api-key.txt`. Pulsa **Guardar conexión**. La caja envía automáticamente eventos pendientes y vuelve a intentarlo cada 45 segundos.
 
 La primera conexión genera un identificador persistente para la caja y envía una copia inicial del catálogo. Cada venta, cambio de inventario, anulación y operación de turno queda en la cola local hasta que la central confirme su recepción. La API deduplica por identificador de caja y evento, de modo que un reintento tras un corte de red no duplica la venta.
 
