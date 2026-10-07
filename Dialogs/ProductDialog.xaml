@@ -1,4 +1,4 @@
-<Window x:Class="SupermercadoPOS.Dialogs.ProductDialog"
+<Window x:Class="Abasto.Dialogs.ProductDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Producto" Width="760" Height="650" MinWidth="700" MinHeight="600"
