@@ -1,8 +1,8 @@
 using System.Windows;
-using SupermercadoPOS.Domain;
-using SupermercadoPOS.Services;
+using Abasto.Domain;
+using Abasto.Services;
 
-namespace SupermercadoPOS.Dialogs;
+namespace Abasto.Dialogs;
 
 public partial class SuspendedSaleDialog : Window
 {
