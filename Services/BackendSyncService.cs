@@ -92,7 +92,8 @@ public static class BackendSyncService
                     Subtotal = record.Subtotal,
                     DiscountTotal = record.DiscountTotal,
                     TaxTotal = record.TaxTotal,
-                    Total = record.Total
+                    Total = record.Total,
+                    ReturnedTotal = payload.ReturnedTotal
                 };
                 sale.Items = payload.Items.Select(item => new SaleItem
                 {
@@ -108,7 +109,9 @@ public static class BackendSyncService
                     DiscountAmount = item.DiscountAmount,
                     LineSubtotal = item.LineSubtotal,
                     LineTax = item.LineTax,
-                    LineTotal = item.LineTotal
+                    LineTotal = item.LineTotal,
+                    ReturnedQuantity = item.ReturnedQuantity,
+                    ReturnedAmount = item.ReturnedAmount
                 }).ToList();
                 sale.Payments = payload.Payments.Select(payment => new Payment
                 {
@@ -116,7 +119,8 @@ public static class BackendSyncService
                     Method = payment.Method,
                     Amount = payment.Amount,
                     Tendered = payment.Tendered,
-                    Change = payment.Change
+                    Change = payment.Change,
+                    ExternalReference = payment.ExternalReference
                 }).ToList();
                 sales.Add(sale);
             }
@@ -263,6 +267,7 @@ public static class BackendSyncService
         public int? CashShiftId { get; set; }
         public string? CustomerName { get; set; }
         public string? CustomerDocument { get; set; }
+        public decimal ReturnedTotal { get; set; }
         public List<CentralSaleItemPayload> Items { get; set; } = [];
         public List<CentralPaymentPayload> Payments { get; set; } = [];
     }
@@ -281,6 +286,8 @@ public static class BackendSyncService
         public decimal LineSubtotal { get; set; }
         public decimal LineTax { get; set; }
         public decimal LineTotal { get; set; }
+        public decimal ReturnedQuantity { get; set; }
+        public decimal ReturnedAmount { get; set; }
     }
 
     private sealed class CentralPaymentPayload
@@ -289,6 +296,7 @@ public static class BackendSyncService
         public decimal Amount { get; set; }
         public decimal Tendered { get; set; }
         public decimal Change { get; set; }
+        public string? ExternalReference { get; set; }
     }
 
     private sealed record SyncBatchRequest(string ClientId, List<SyncEventRequest> Events);
