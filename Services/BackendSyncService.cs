@@ -3,9 +3,9 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
-using SupermercadoPOS.Domain;
+using Abasto.Domain;
 
-namespace SupermercadoPOS.Services;
+namespace Abasto.Services;
 
 public sealed record BackendSyncResult(bool IsConfigured, bool IsConnected, int SentCount, int PendingCount, string Message);
 
