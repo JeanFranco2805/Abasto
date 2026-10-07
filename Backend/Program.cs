@@ -9,7 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 var databaseProvider = builder.Configuration["Database:Provider"] ?? "Sqlite";
 var configuredConnection = builder.Configuration.GetConnectionString("CentralDatabase");
-var databasePath = Path.Combine(builder.Environment.ContentRootPath, "data", "supermercado-central.db");
+var databaseDirectory = Path.Combine(
+    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+    "SupermercadoPOS", "Backend");
+var databasePath = Path.Combine(databaseDirectory, "supermercado-central.db");
 Directory.CreateDirectory(Path.GetDirectoryName(databasePath)!);
 var connectionString = string.IsNullOrWhiteSpace(configuredConnection)
     ? $"Data Source={databasePath}"
