@@ -4,15 +4,15 @@
         Title="Descuento autorizado"
         Width="500" Height="520" ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
-        Background="#11191E"
+        Background="#101722"
         FontFamily="Segoe UI">
   <Grid Margin="22">
     <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="*" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
     <StackPanel Margin="0,0,0,14">
-      <TextBlock Text="Aplicar descuento" FontSize="24" FontWeight="Bold" Foreground="#EEF2EF" />
-      <TextBlock Text="El cambio requiere aprobación de supervisor." Foreground="#A1AEAB" Margin="0,4,0,0" />
+      <TextBlock Text="Aplicar descuento" FontSize="24" FontWeight="Bold" Foreground="#F1F4F8" />
+      <TextBlock Text="El cambio requiere aprobación de supervisor." Foreground="#9AA9BB" Margin="0,4,0,0" />
     </StackPanel>
-    <Border Grid.Row="1" Background="#1A252A" CornerRadius="5" Padding="18">
+    <Border Grid.Row="1" Background="#1B2938" CornerRadius="5" Padding="18">
       <StackPanel>
         <TextBlock Text="Porcentaje (0 a 100)" Style="{StaticResource FieldLabel}" />
         <TextBox x:Name="PercentBox" Text="5" Margin="0,0,0,14" />
@@ -25,7 +25,7 @@
     </Border>
     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
       <Button Content="Cancelar" Click="Cancel_Click" Margin="0,0,10,0" />
-      <Button Content="Autorizar" Click="Authorize_Click" Background="#36A995" Foreground="White" />
+      <Button Content="Autorizar" Click="Authorize_Click" Background="#2E6BC7" Foreground="White" />
     </StackPanel>
   </Grid>
 </Window>
