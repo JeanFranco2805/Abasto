@@ -3,10 +3,10 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
-using SupermercadoPOS.Domain;
-using SupermercadoPOS.Services;
+using Abasto.Domain;
+using Abasto.Services;
 
-namespace SupermercadoPOS.Dialogs;
+namespace Abasto.Dialogs;
 
 public partial class ProductDialog : Window
 {
@@ -204,7 +204,7 @@ public partial class ProductDialog : Window
 
     private static string CopyImageToStorage(string sourcePath)
     {
-        var dataDirectory = Path.GetDirectoryName(SupermercadoPOS.App.DatabasePath)
+        var dataDirectory = Path.GetDirectoryName(Abasto.App.DatabasePath)
             ?? throw new InvalidOperationException("No se encontró la carpeta de datos del punto de venta.");
         var imageDirectory = Path.Combine(dataDirectory, "product-images");
         Directory.CreateDirectory(imageDirectory);
