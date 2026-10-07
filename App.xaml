@@ -134,9 +134,6 @@
                 <Setter Property="Foreground" Value="#F1F4F8" />
                 <Setter TargetName="TabIcon" Property="Foreground" Value="#8FB4EA" />
               </Trigger>
-              <Trigger Property="IsKeyboardFocused" Value="True">
-                <Setter TargetName="TabBorder" Property="BorderBrush" Value="#8FB4EA" />
-              </Trigger>
               <Trigger Property="IsSelected" Value="True">
                 <Setter TargetName="TabBorder" Property="Background" Value="#17263A" />
                 <Setter Property="Foreground" Value="#F1F4F8" />
