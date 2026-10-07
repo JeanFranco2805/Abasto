@@ -22,7 +22,7 @@ $env:ASPNETCORE_URLS = "http://0.0.0.0:5080"
 dotnet run --project .\Backend\Backend.csproj
 ```
 
-La base central SQLite se crea en `Backend\data\supermercado-central.db`. Para usar PostgreSQL en el servidor, configura las variables antes de iniciar la API:
+La base central SQLite se crea en `%LOCALAPPDATA%\SupermercadoPOS\Backend\supermercado-central.db` en el equipo que ejecuta la API. Para usar PostgreSQL en el servidor, configura las variables antes de iniciar la API:
 
 ```powershell
 $env:Database__Provider = "PostgreSql"
