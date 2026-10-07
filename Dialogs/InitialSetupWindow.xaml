@@ -1,0 +1,51 @@
+<Window x:Class="Abasto.Dialogs.InitialSetupWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Configurar Abasto"
+        Width="560" Height="650" MinWidth="520" MinHeight="620" ResizeMode="NoResize"
+        WindowStartupLocation="CenterScreen"
+        Background="#1B2938"
+        FontFamily="Segoe UI" xml:lang="es-CO">
+  <Grid Margin="28">
+    <Border Background="#17263A" BorderBrush="#2E3D52" BorderThickness="1" CornerRadius="8" Padding="32">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+          <TextBlock Text="ABASTO" FontSize="11" FontWeight="Bold" Foreground="#8FB4EA" />
+          <TextBlock Text="Crear cuenta administradora" FontSize="24" FontWeight="SemiBold"
+                     Foreground="#F1F4F8" Margin="0,8,0,6" />
+          <TextBlock Text="Configura el acceso inicial de tu tienda. El PIN lo eliges tú y queda protegido en esta caja."
+                     FontSize="13" Foreground="#9AA9BB" TextWrapping="Wrap" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,20">
+          <TextBlock Text="Nombre" FontSize="13" FontWeight="SemiBold" Foreground="#CCD5E1" Margin="0,0,0,6" />
+          <TextBox x:Name="DisplayNameBox" MaxLength="80" Margin="0,0,0,14" />
+
+          <TextBlock Text="Usuario" FontSize="13" FontWeight="SemiBold" Foreground="#CCD5E1" Margin="0,0,0,6" />
+          <TextBox x:Name="UsernameBox" MaxLength="40" Margin="0,0,0,14" />
+
+          <TextBlock Text="PIN (4 a 12 dígitos)" FontSize="13" FontWeight="SemiBold" Foreground="#CCD5E1" Margin="0,0,0,6" />
+          <PasswordBox x:Name="PinBox" MaxLength="12" Margin="0,0,0,14" />
+
+          <TextBlock Text="Confirmar PIN" FontSize="13" FontWeight="SemiBold" Foreground="#CCD5E1" Margin="0,0,0,6" />
+          <PasswordBox x:Name="ConfirmPinBox" MaxLength="12" />
+
+          <TextBlock x:Name="ErrorText" Foreground="#FFB4AB" TextWrapping="Wrap" MinHeight="20"
+                     FontSize="12" Margin="0,10,0,0" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+          <Button Content="Cancelar" IsCancel="True" Margin="0,0,10,0" Padding="16,10" />
+          <Button x:Name="CreateButton" Content="Crear cuenta" Click="Create_Click" IsDefault="True"
+                  Background="#2E6BC7" Foreground="White" BorderBrush="#2E6BC7" Padding="18,10" />
+        </StackPanel>
+      </Grid>
+    </Border>
+  </Grid>
+</Window>
