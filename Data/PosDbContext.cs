@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using SupermercadoPOS.Domain;
+using Abasto.Domain;
 
-namespace SupermercadoPOS.Data;
+namespace Abasto.Data;
 
 public sealed class PosDbContext(DbContextOptions<PosDbContext> options) : DbContext(options)
 {
