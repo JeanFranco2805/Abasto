@@ -134,11 +134,33 @@
                                 <TextBlock Text="{Binding Unit}" FontSize="10" FontWeight="Bold" Foreground="#BBC7D4" />
                               </Border>
                             </Grid>
-                            <StackPanel Grid.Row="1" VerticalAlignment="Center" Margin="0,8,0,5">
-                              <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold" Foreground="#F1F4F8"
-                                         TextWrapping="Wrap" MaxHeight="40" />
-                              <TextBlock Text="{Binding Barcode}" FontSize="10" Foreground="#8A99AE" Margin="0,4,0,0" />
-                            </StackPanel>
+                            <Grid Grid.Row="1" Margin="0,8,0,5">
+                              <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="44" /></Grid.ColumnDefinitions>
+                              <StackPanel VerticalAlignment="Center" Margin="0,0,6,0">
+                                <TextBlock Text="{Binding Name}" FontSize="14" FontWeight="SemiBold" Foreground="#F1F4F8"
+                                           TextWrapping="Wrap" MaxHeight="40" />
+                                <TextBlock Text="{Binding Barcode}" FontSize="10" Foreground="#8A99AE" Margin="0,4,0,0" />
+                              </StackPanel>
+                              <Border Grid.Column="1" Width="42" Height="42" Background="#24354A" CornerRadius="5"
+                                      VerticalAlignment="Center" ClipToBounds="True">
+                                <Grid>
+                                  <Image Source="{Binding ImagePath}" Stretch="UniformToFill" />
+                                  <TextBlock Text="&#xE91B;" FontFamily="Segoe MDL2 Assets" FontSize="17"
+                                             Foreground="#8FB4EA" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <TextBlock.Style>
+                                      <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                        <Style.Triggers>
+                                          <DataTrigger Binding="{Binding ImagePath}" Value="">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                          </DataTrigger>
+                                        </Style.Triggers>
+                                      </Style>
+                                    </TextBlock.Style>
+                                  </TextBlock>
+                                </Grid>
+                              </Border>
+                            </Grid>
                             <Grid Grid.Row="2">
                               <TextBlock Text="{Binding Stock, StringFormat='Existencias: {0:N2}'}" FontSize="10"
                                          Foreground="#9AA9BB" VerticalAlignment="Center" />
@@ -523,15 +545,37 @@
                         </StackPanel>
                       </Border>
                     </Grid>
-                    <StackPanel Grid.Row="1" Margin="0,13,0,12" VerticalAlignment="Center">
-                      <TextBlock Text="{Binding Name}" FontSize="17" FontWeight="Bold" Foreground="#F1F4F8"
-                                 TextWrapping="Wrap" MaxHeight="46" TextTrimming="CharacterEllipsis" />
-                      <StackPanel Orientation="Horizontal" Margin="0,7,0,0">
-                        <TextBlock Text="&#xE8EC;" FontFamily="Segoe MDL2 Assets" FontSize="12"
-                                   Foreground="#8A99AE" Margin="0,0,6,0" />
-                        <TextBlock Text="{Binding Barcode}" FontSize="12" Foreground="#9AA9BB" />
+                    <Grid Grid.Row="1" Margin="0,13,0,12">
+                      <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="72" /></Grid.ColumnDefinitions>
+                      <StackPanel VerticalAlignment="Center" Margin="0,0,8,0">
+                        <TextBlock Text="{Binding Name}" FontSize="17" FontWeight="Bold" Foreground="#F1F4F8"
+                                   TextWrapping="Wrap" MaxHeight="46" TextTrimming="CharacterEllipsis" />
+                        <StackPanel Orientation="Horizontal" Margin="0,7,0,0">
+                          <TextBlock Text="&#xE8EC;" FontFamily="Segoe MDL2 Assets" FontSize="12"
+                                     Foreground="#8A99AE" Margin="0,0,6,0" />
+                          <TextBlock Text="{Binding Barcode}" FontSize="12" Foreground="#9AA9BB" />
+                        </StackPanel>
                       </StackPanel>
-                    </StackPanel>
+                      <Border Grid.Column="1" Width="64" Height="64" Background="#24354A" CornerRadius="5"
+                              VerticalAlignment="Center" ClipToBounds="True">
+                        <Grid>
+                          <Image Source="{Binding ImagePath}" Stretch="UniformToFill" />
+                          <TextBlock Text="&#xE91B;" FontFamily="Segoe MDL2 Assets" FontSize="21"
+                                     Foreground="#8FB4EA" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock.Style>
+                              <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                  <DataTrigger Binding="{Binding ImagePath}" Value="">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                  </DataTrigger>
+                                </Style.Triggers>
+                              </Style>
+                            </TextBlock.Style>
+                          </TextBlock>
+                        </Grid>
+                      </Border>
+                    </Grid>
                     <Grid Grid.Row="2" Margin="0,9,0,0">
                       <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                       <StackPanel VerticalAlignment="Center">
