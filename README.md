@@ -1,42 +1,63 @@
 # Supermercado POS
 
-Aplicación de escritorio Windows en C#/.NET 10 LTS con WPF. Este proyecto es la primera base funcional del POS y guarda sus datos localmente con SQLite.
+Aplicación de escritorio Windows en C#/.NET 10 LTS con WPF. Cada caja conserva una base SQLite local para poder vender sin internet. El servicio de esta carpeta `Backend` recibe y guarda la cola en una base central y permite consultar el catálogo, las ventas y los eventos sincronizados.
 
-## Ejecutar
+## Ejecutar la aplicación de caja
 
-Para abrir la versión compilada en Windows, haz doble clic en `publish\win-x64\SupermercadoPOS.exe`. Es autocontenida y no requiere instalar el SDK ni el runtime de .NET.
+Para abrir la versión publicada en Windows, usa `publish\win-x64\SupermercadoPOS.exe`. La base local se guarda en `%LOCALAPPDATA%\SupermercadoPOS\data\pos.db`.
 
-Para ejecutar el código fuente durante el desarrollo, se requiere el SDK de .NET 10:
+Para compilar desde el código fuente se requiere el SDK de .NET 10:
 
-    dotnet run --project .\SupermercadoPOS.csproj
+```powershell
+dotnet run --project .\SupermercadoPOS.csproj
+```
 
-La base local se crea en %LOCALAPPDATA%\SupermercadoPOS\data\pos.db.
+## Levantar la API central
 
-## Incluido en esta versión
+En el equipo que alojará el backend, desde la carpeta del proyecto:
 
-- Inicio de sesión por usuario y PIN con PIN almacenado como hash.
-- Catálogo local con búsqueda por código o nombre y mantenimiento de productos.
-- Lectura de escáner tipo teclado: el lector escribe el código y envía Enter.
-- Carrito, cantidades por unidad o incrementos de 0,1 kg, cálculo de subtotal e impuesto.
-- Captura opcional de nombre y documento del cliente en la venta y en el comprobante.
-- Pago con efectivo, tarjeta, transferencia o billetera; admite pagos mixtos y calcula el cambio en efectivo.
-- Los medios no monetarios se registran manualmente; aún no se solicita ni valida el cobro en el datáfono.
-- Descuento manual por producto con autorización de supervisor y registro del aprobador.
-- Retiro de productos del carrito con autorización de supervisor.
-- Apertura, entradas y salidas de efectivo, cierre y arqueo de turno.
-- Historial de turnos y movimientos de efectivo por turno.
-- Suspensión y reanudación de ventas antes de cobrar.
-- Anulación de una venta completa pagada en efectivo, dentro del turno abierto, con autorización y reposición de inventario.
-- Descuento de inventario dentro de la transacción local de venta.
-- Impresión de comprobante mediante una impresora instalada en Windows.
-- Copia diaria rotativa de la base local, actualizada después de ventas y movimientos de caja.
-- Registro de auditoría y cola local de eventos pendientes para sincronización futura.
-- Resumen de ventas del día e historial reciente.
-- Reportes filtrados por fechas, por cajero y turno, con ventas por medio de pago y productos más y menos vendidos.
-- Pantalla de auditoría con las operaciones recientes.
-- Administración de usuarios para perfil Administrador: crear cajeros, supervisores y administradores, restablecer PIN y activar o desactivar usuarios.
-- Pantalla de conectividad que muestra la cola local de sincronización y el estado de las copias.
-- Atajos de teclado: F2 búsqueda, F3 código de barras, F4 cobrar, F7 gestionar turno, F8 suspender y F9 reanudar.
+```powershell
+$env:Backend__ApiKey = "reemplaza-por-una-clave-larga-y-privada"
+$env:ASPNETCORE_URLS = "http://0.0.0.0:5080"
+dotnet run --project .\Backend\Backend.csproj
+```
+
+La base central SQLite se crea en `Backend\data\supermercado-central.db`. Para usar PostgreSQL en el servidor, configura las variables antes de iniciar la API:
+
+```powershell
+$env:Database__Provider = "PostgreSql"
+$env:ConnectionStrings__CentralDatabase = "Host=servidor;Database=supermercado_pos;Username=pos_app;Password=clave"
+```
+
+El proceso de la API también necesita `Backend__ApiKey`. Para una instalación accesible fuera de la red local, coloca la API detrás de HTTPS y restringe el acceso de red al servidor.
+
+## Conectar las cajas
+
+1. Inicia el backend y confirma que `http://localhost:5080/health` muestra `status: ok` desde el mismo servidor.
+2. En cada caja abre **Conectividad**.
+3. Escribe la URL de la API (`http://IP-DEL-SERVIDOR:5080` en la red local o su URL HTTPS) y la misma clave configurada en el servidor.
+4. Pulsa **Guardar conexión**. La caja envía automáticamente eventos pendientes y vuelve a intentarlo cada 45 segundos.
+
+La primera conexión genera un identificador persistente para la caja y envía una copia inicial del catálogo. Cada venta, cambio de inventario, anulación y operación de turno queda en la cola local hasta que la central confirme su recepción. La API deduplica por identificador de caja y evento, de modo que un reintento tras un corte de red no duplica la venta.
+
+La URL base de la API debe terminar en la dirección del servicio, no en `/api`. La clave de la caja se conserva en `%LOCALAPPDATA%\SupermercadoPOS\backend.json`; no se sincronizan los PIN de los cajeros.
+
+## Rutas de la API
+
+- `GET /health`: estado del proceso, sin autenticación.
+- `GET /api/sync/summary`: conteo de eventos y cajas, requiere `X-Api-Key`.
+- `POST /api/sync/events`: recibe lotes de hasta 100 eventos, requiere `X-Api-Key`.
+- `GET /api/sync/events?clientId=<id>&take=100`: historial central, requiere `X-Api-Key`.
+- `GET /api/products?clientId=<id>`: catálogo recibido, requiere `X-Api-Key`.
+- `GET /api/sales?clientId=<id>&take=100`: ventas recibidas, requiere `X-Api-Key`.
+
+## Notas operativas
+
+- La API usa SQLite por defecto para que pueda ejecutarse sin servicios adicionales. PostgreSQL está disponible para alojar una central con varias cajas; configúralo antes de iniciar el backend. [El proveedor oficial de Npgsql ofrece soporte para EF Core 10](https://www.npgsql.org/efcore/release-notes/10.0.html).
+- La base local de cada caja sigue operando sin conexión; una interrupción de internet no bloquea el cobro.
+- La base central se inicializa con `EnsureCreated`; antes de actualizar un backend que ya tenga datos, conserva una copia de seguridad. Aún no se incluye un sistema de migraciones versionadas.
+- Esta API sincroniza y consulta productos, ventas y eventos de caja. No reemplaza la facturación electrónica DIAN, el datáfono, ni reglas de conciliación entre cajas que modifiquen el mismo inventario.
+- Configura claves distintas de las credenciales de demostración y no publiques la API por HTTP abierto en internet.
 
 ## Cuentas iniciales de demostración
 
@@ -45,26 +66,3 @@ La base local se crea en %LOCALAPPDATA%\SupermercadoPOS\data\pos.db.
 | cajero | 1111 | Cajero |
 | supervisor | 1234 | Supervisor |
 | admin | 2468 | Administrador |
-
-Estas cuentas son únicamente para demostración. La aplicación permite cambiar PIN desde el perfil Administrador, pero todavía no configura bloqueo por intentos. No se debe desplegar a clientes con estas credenciales.
-
-## Supuestos y pendientes antes de uso comercial
-
-- Los precios de ejemplo y sus tasas de impuesto son datos de demostración. La configuración tributaria debe validarse con el negocio y con la integración de facturación que se seleccione.
-- La venta se guarda sin conexión en el equipo. La cola de sincronización ya tiene una estructura inicial, pero falta implementar el cliente y las reglas de conciliación con un back office/ERP.
-- La pantalla de conectividad informa el estado local y los eventos pendientes; no puede enviar datos a una central hasta configurar e implementar el servicio de sincronización.
-- El comprobante impreso es un recibo genérico del sistema. No equivale a factura electrónica ni aplica reglas fiscales confirmadas.
-- Las interfaces IReceiptPrinter, IScale, IPaymentTerminal, IElectronicInvoicingProvider e IBackOfficeSyncClient definen puntos de integración. Sus implementaciones requieren conocer modelos, controladores, proveedores y protocolos reales.
-- No están implementados todavía la factura electrónica/DIAN, promociones automáticas como 2x1, devoluciones parciales/notas crédito, ni la pantalla secundaria.
-- La anulación disponible cubre solo ventas pagadas completamente en efectivo dentro del turno abierto; no reemplaza un flujo completo de devolución o nota crédito.
-- Cada instalación usa su propia base SQLite. No se debe copiar esa base a una carpeta de red para compartirla entre cajas. La sincronización multi-caja necesita un servicio central y reglas explícitas para conflictos.
-- El acceso de supervisor se aplica al mantenimiento de productos, descuentos manuales, retiro de productos del carrito y anulación de ventas en efectivo. La aplicación no incluye apertura de cajón ni un flujo de devolución parcial.
-- La base inicial se crea con EnsureCreated; aún no hay un mecanismo de migraciones/actualización para instalaciones con datos.
-
-## Siguiente alcance recomendado
-
-1. Definir reglas de factura/ticket, impuestos, redondeo y contingencia fiscal.
-2. Implementar devoluciones parciales y notas crédito con autorizaciones auditadas.
-3. Integrar y probar impresora, cajón, báscula y datáfono con los modelos del cliente piloto.
-4. Añadir sincronización idempotente con back office y conciliación de inventario entre cajas.
-5. Incorporar copias de seguridad con restauración, migraciones y administración segura de usuarios.
