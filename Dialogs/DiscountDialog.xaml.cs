@@ -1,19 +1,20 @@
 using System.Globalization;
 using System.Windows;
-using SupermercadoPOS.Domain;
-using SupermercadoPOS.Services;
+using Abasto.Domain;
+using Abasto.Services;
 
-namespace SupermercadoPOS.Dialogs;
+namespace Abasto.Dialogs;
 
 public partial class DiscountDialog : Window
 {
     public decimal DiscountRate { get; private set; }
     public string ApprovedBy { get; private set; } = "";
 
-    public DiscountDialog(decimal initialPercent = 5m)
+    public DiscountDialog(decimal initialPercent = 0m)
     {
         InitializeComponent();
         PercentBox.Text = initialPercent.ToString("0.##", CultureInfo.CurrentCulture);
+        Loaded += (_, _) => UsernameBox.Focus();
     }
 
     private async void Authorize_Click(object sender, RoutedEventArgs e)
