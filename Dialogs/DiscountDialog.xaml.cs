@@ -36,7 +36,7 @@ public partial class DiscountDialog : Window
             var user = await PosService.AuthenticateAsync(UsernameBox.Text, PinBox.Password);
             if (user is null || user.Role == "Cajero")
             {
-                ErrorText.Text = "Usuario o PIN de supervisor incorrecto.";
+                ErrorText.Text = "El usuario o PIN no tiene permisos de autorización.";
                 PinBox.Clear();
                 PinBox.Focus();
                 return;
