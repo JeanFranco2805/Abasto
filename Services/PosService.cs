@@ -12,6 +12,11 @@ public static class PosService
 {
     private const int PinIterations = 120_000;
     private static readonly SemaphoreSlim BackupLock = new(1, 1);
+    private static readonly string[] DemoProductBarcodes =
+    [
+        "7701001000011", "7701001000012", "7701001000013", "7701001000014",
+        "7701001000015", "7701001000016", "7701001000017", "7701001000018"
+    ];
 
     public static async Task InitializeAsync(string databasePath)
     {
@@ -19,26 +24,11 @@ public static class PosService
         await db.Database.EnsureCreatedAsync();
         await EnsureProductImageColumnAsync(db);
 
-        if (!await db.Products.AnyAsync())
-        {
-            db.Products.AddRange(
-                new Product { Barcode = "7701001000011", Name = "Arroz blanco 1 kg", Category = "Granos", Unit = "UND", UnitPrice = 5200m, TaxRate = 0m, Stock = 48m, MinimumStock = 8m },
-                new Product { Barcode = "7701001000012", Name = "Leche entera 1 L", Category = "Lácteos", Unit = "UND", UnitPrice = 4300m, TaxRate = 0m, Stock = 32m, MinimumStock = 6m },
-                new Product { Barcode = "7701001000013", Name = "Huevos AA x 12", Category = "Refrigerados", Unit = "UND", UnitPrice = 10800m, TaxRate = 0m, Stock = 24m, MinimumStock = 5m },
-                new Product { Barcode = "7701001000014", Name = "Pan tajado", Category = "Panadería", Unit = "UND", UnitPrice = 4700m, TaxRate = 0.05m, Stock = 18m, MinimumStock = 4m },
-                new Product { Barcode = "7701001000015", Name = "Manzana roja", Category = "Frutas", Unit = "KG", UnitPrice = 8900m, TaxRate = 0m, Stock = 15m, MinimumStock = 3m },
-                new Product { Barcode = "7701001000016", Name = "Café molido 250 g", Category = "Despensa", Unit = "UND", UnitPrice = 14900m, TaxRate = 0.05m, Stock = 20m, MinimumStock = 4m },
-                new Product { Barcode = "7701001000017", Name = "Jabón para platos", Category = "Aseo", Unit = "UND", UnitPrice = 6200m, TaxRate = 0.19m, Stock = 14m, MinimumStock = 3m },
-                new Product { Barcode = "7701001000018", Name = "Tomate chonto", Category = "Verduras", Unit = "KG", UnitPrice = 3900m, TaxRate = 0m, Stock = 12m, MinimumStock = 2m }
-            );
-            await db.SaveChangesAsync();
-        }
+        await RemoveDemoDataAsync(db);
 
         if (!await db.Users.AnyAsync())
         {
-            db.Users.Add(CreateUser("cajero", "Cajero de demostración", "1111", "Cajero"));
-            db.Users.Add(CreateUser("supervisor", "Supervisor de demostración", "1234", "Supervisor"));
-            db.Users.Add(CreateUser("admin", "Administrador de demostración", "2468", "Administrador"));
+            db.Users.Add(CreateUser("admin", "Administrador", "2468", "Administrador"));
             await db.SaveChangesAsync();
         }
 
@@ -51,6 +41,36 @@ public static class PosService
                 db.SyncQueue.Add(CreateSyncEvent("Product", product.Id.ToString(), "ProductSnapshot", ProductPayload(product)));
             await db.SaveChangesAsync();
         }
+    }
+
+    private static async Task RemoveDemoDataAsync(PosDbContext db)
+    {
+        var demoProducts = await db.Products
+            .Where(product => DemoProductBarcodes.Contains(product.Barcode))
+            .ToListAsync();
+        if (demoProducts.Count > 0)
+        {
+            var demoProductIds = demoProducts.Select(product => product.Id.ToString()).ToArray();
+            var demoEvents = await db.SyncQueue
+                .Where(item => item.EntityType == "Product" && demoProductIds.Contains(item.EntityId))
+                .ToListAsync();
+            db.SyncQueue.RemoveRange(demoEvents);
+            db.Products.RemoveRange(demoProducts);
+        }
+
+        var demoUsers = await db.Users.Where(user =>
+            (user.Username == "cajero" && user.DisplayName == "Cajero de demostración")
+            || (user.Username == "supervisor" && user.DisplayName == "Supervisor de demostración"))
+            .ToListAsync();
+        db.Users.RemoveRange(demoUsers);
+
+        var demoAdmin = await db.Users.FirstOrDefaultAsync(user =>
+            user.Username == "admin" && user.DisplayName == "Administrador de demostración");
+        if (demoAdmin is not null)
+            demoAdmin.DisplayName = "Administrador";
+
+        if (demoProducts.Count > 0 || demoUsers.Count > 0 || demoAdmin is not null)
+            await db.SaveChangesAsync();
     }
 
     private static async Task EnsureProductImageColumnAsync(PosDbContext db)
@@ -568,20 +588,7 @@ public static class PosService
         if (!suspendedSaleId.HasValue)
             db.Sales.Add(sale);
         await db.SaveChangesAsync();
-        db.SyncQueue.Add(CreateSyncEvent("Sale", sale.Id.ToString(), "SaleCompleted", new
-            {
-                sale.Id,
-                sale.CreatedAtUtc,
-                sale.Status,
-                sale.CashierId,
-                sale.CashierName,
-                sale.Subtotal,
-                sale.DiscountTotal,
-                sale.TaxTotal,
-                sale.Total,
-                Items = sale.Items.Select(i => new { i.ProductId, i.Barcode, i.ProductName, i.Unit, i.Quantity, i.UnitPrice, i.TaxRate, i.DiscountAmount, i.DiscountApprovedBy, i.LineSubtotal, i.LineTax, i.LineTotal }),
-                Payments = sale.Payments.Select(p => new { p.Method, p.Amount, p.Tendered, p.Change })
-            }));
+        db.SyncQueue.Add(CreateSyncEvent("Sale", sale.Id.ToString(), "SaleCompleted", SalePayload(sale)));
         await AddAuditAsync(db, "Venta completada", $"Venta #{sale.Id} por {sale.Total:C0}");
         await db.SaveChangesAsync();
         await transaction.CommitAsync();
@@ -642,7 +649,7 @@ public static class PosService
             Amount = refund,
             Reason = $"Devolución por anulación de venta #{sale.Id}"
         });
-        db.SyncQueue.Add(CreateSyncEvent("Sale", sale.Id.ToString(), "SaleVoided", new { sale.Id, sale.Status, sale.CreatedAtUtc, refundedAmount = refund }));
+        db.SyncQueue.Add(CreateSyncEvent("Sale", sale.Id.ToString(), "SaleVoided", SalePayload(sale)));
         await AddAuditAsync(db, "Venta anulada",
             $"Venta #{sale.Id}; devolución en efectivo: {refund:C0}; autorizó {supervisor.DisplayName}");
         await db.SaveChangesAsync();
@@ -691,6 +698,77 @@ public static class PosService
                 && s.CreatedAtUtc >= startUtc && s.CreatedAtUtc < endUtc)
             .OrderByDescending(s => s.CreatedAtUtc)
             .ToListAsync();
+    }
+
+    public static async Task<List<Sale>> GetPendingSalesBetweenAsync(DateTime fromLocal, DateTime toLocal)
+    {
+        var startUtc = fromLocal.Date.ToUniversalTime();
+        var endUtc = toLocal.Date.AddDays(1).ToUniversalTime();
+        await using var db = App.CreateDbContext();
+        var pendingIds = await db.SyncQueue.AsNoTracking()
+            .Where(item => item.EntityType == "Sale" && item.Status == "Pendiente")
+            .Select(item => item.EntityId)
+            .Distinct()
+            .ToListAsync();
+        var saleIds = pendingIds.Select(id => long.TryParse(id, out var parsed) ? parsed : 0)
+            .Where(id => id > 0).Distinct().ToArray();
+        if (saleIds.Length == 0)
+            return [];
+        return await db.Sales.AsNoTracking()
+            .Include(sale => sale.Items)
+            .Include(sale => sale.Payments)
+            .Where(sale => saleIds.Contains(sale.Id)
+                && (sale.Status == "Completada" || sale.Status == "Anulada")
+                && sale.CreatedAtUtc >= startUtc && sale.CreatedAtUtc < endUtc)
+            .ToListAsync();
+    }
+
+    public static async Task<List<Product>> MergeServerProductsAsync(IReadOnlyCollection<Product> serverProducts)
+    {
+        await using var db = App.CreateDbContext();
+        var pendingIdsText = await db.SyncQueue.AsNoTracking()
+            .Where(item => item.EntityType == "Product" && item.Status == "Pendiente")
+            .Select(item => item.EntityId)
+            .Distinct()
+            .ToListAsync();
+        var pendingIds = pendingIdsText.Select(id => int.TryParse(id, out var parsed) ? parsed : 0)
+            .Where(id => id > 0).ToHashSet();
+        var localProducts = await db.Products.ToListAsync();
+        var byId = localProducts.ToDictionary(product => product.Id);
+        var byBarcode = localProducts.ToDictionary(product => product.Barcode, StringComparer.Ordinal);
+
+        foreach (var remote in serverProducts)
+        {
+            if (pendingIds.Contains(remote.Id))
+                continue;
+
+            if (!byId.TryGetValue(remote.Id, out var local)
+                && !byBarcode.TryGetValue(remote.Barcode, out local))
+            {
+                local = new Product { Id = remote.Id, Barcode = remote.Barcode };
+                db.Products.Add(local);
+                localProducts.Add(local);
+                byId[local.Id] = local;
+                byBarcode[local.Barcode] = local;
+            }
+
+            local.Barcode = remote.Barcode;
+            local.Name = remote.Name;
+            local.Category = remote.Category;
+            local.Unit = remote.Unit;
+            local.UnitPrice = remote.UnitPrice;
+            local.TaxRate = remote.TaxRate;
+            local.Stock = remote.Stock;
+            local.MinimumStock = remote.MinimumStock;
+            local.IsActive = remote.IsActive;
+            local.UpdatedAtUtc = remote.UpdatedAtUtc;
+        }
+
+        await db.SaveChangesAsync();
+        var serverIds = serverProducts.Select(product => product.Id).ToHashSet();
+        return localProducts.Where(product => product.IsActive
+                && (serverIds.Contains(product.Id) || pendingIds.Contains(product.Id)))
+            .OrderBy(product => product.Name).ToList();
     }
 
     public static async Task<SalesSummary> GetSalesSummaryBetweenAsync(DateTime fromLocal, DateTime toLocal)
@@ -829,6 +907,38 @@ public static class PosService
         product.MinimumStock,
         product.IsActive,
         product.UpdatedAtUtc
+    };
+
+    private static object SalePayload(Sale sale) => new
+    {
+        sale.Id,
+        sale.CreatedAtUtc,
+        sale.Status,
+        sale.CashierId,
+        sale.CashierName,
+        sale.CashShiftId,
+        sale.CustomerName,
+        sale.CustomerDocument,
+        sale.Subtotal,
+        sale.DiscountTotal,
+        sale.TaxTotal,
+        sale.Total,
+        Items = sale.Items.Select(item => new
+        {
+            item.ProductId,
+            item.Barcode,
+            item.ProductName,
+            item.Unit,
+            item.Quantity,
+            item.UnitPrice,
+            item.TaxRate,
+            item.DiscountApprovedBy,
+            item.DiscountAmount,
+            item.LineSubtotal,
+            item.LineTax,
+            item.LineTotal
+        }),
+        Payments = sale.Payments.Select(payment => new { payment.Method, payment.Amount, payment.Tendered, payment.Change })
     };
 
     private static PosUser CreateUser(string username, string displayName, string pin, string role)
