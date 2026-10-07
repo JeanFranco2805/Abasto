@@ -1,4 +1,4 @@
-<Window x:Class="SupermercadoPOS.Dialogs.PaymentDialog"
+<Window x:Class="Abasto.Dialogs.PaymentDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Cobrar venta"
