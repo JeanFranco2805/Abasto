@@ -41,9 +41,11 @@ public sealed class Sale
     public decimal DiscountTotal { get; set; }
     public decimal TaxTotal { get; set; }
     public decimal Total { get; set; }
+    public decimal ReturnedTotal { get; set; }
     public bool IsSynced { get; set; }
     public List<SaleItem> Items { get; set; } = [];
     public List<Payment> Payments { get; set; } = [];
+    public List<SaleReturn> Returns { get; set; } = [];
 }
 
 public sealed class SaleItem
@@ -63,6 +65,8 @@ public sealed class SaleItem
     public decimal LineSubtotal { get; set; }
     public decimal LineTax { get; set; }
     public decimal LineTotal { get; set; }
+    public decimal ReturnedQuantity { get; set; }
+    public decimal ReturnedAmount { get; set; }
 }
 
 public sealed class Payment
@@ -75,6 +79,61 @@ public sealed class Payment
     public decimal Tendered { get; set; }
     public decimal Change { get; set; }
     public string? ExternalReference { get; set; }
+}
+
+public sealed class SaleReturn
+{
+    public long Id { get; set; }
+    public long SaleId { get; set; }
+    public Sale? Sale { get; set; }
+    public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
+    public int CashierId { get; set; }
+    public string CashierName { get; set; } = "";
+    public int SupervisorId { get; set; }
+    public string SupervisorName { get; set; } = "";
+    public string Reason { get; set; } = "";
+    public decimal Total { get; set; }
+    public List<SaleReturnItem> Items { get; set; } = [];
+    public List<SaleReturnPayment> Payments { get; set; } = [];
+}
+
+public sealed class SaleReturnItem
+{
+    public long Id { get; set; }
+    public long SaleReturnId { get; set; }
+    public SaleReturn? SaleReturn { get; set; }
+    public long SaleItemId { get; set; }
+    public int ProductId { get; set; }
+    public string ProductName { get; set; } = "";
+    public string Unit { get; set; } = "UND";
+    public decimal Quantity { get; set; }
+    public decimal Amount { get; set; }
+}
+
+public sealed class SaleReturnPayment
+{
+    public long Id { get; set; }
+    public long SaleReturnId { get; set; }
+    public SaleReturn? SaleReturn { get; set; }
+    public long OriginalPaymentId { get; set; }
+    public string Method { get; set; } = "Efectivo";
+    public decimal Amount { get; set; }
+    public string? ExternalReference { get; set; }
+}
+
+public sealed class FiscalDocument
+{
+    public long Id { get; set; }
+    public long SaleId { get; set; }
+    public long? SaleReturnId { get; set; }
+    public string Kind { get; set; } = "Factura";
+    public string Status { get; set; } = "Emitida";
+    public string Provider { get; set; } = "";
+    public string DocumentNumber { get; set; } = "";
+    public string ProviderDocumentId { get; set; } = "";
+    public string ResponsePayload { get; set; } = "";
+    public string Error { get; set; } = "";
+    public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 }
 
 public sealed class CashShift
